@@ -2,6 +2,6 @@
     "start_path": ".vscode/entry.lua",
     "preload": {
         "open": ["lua51"],
-        "require": [".vscode/ca_types", ".vscode/uimf_types", ".vscode/sfo_types.lua"]
+        "require": [".vscode/ca_types", ".vscode/uimf_types", ".vscode/sfo_types"]
     }
 }

@@ -1,4 +1,7 @@
+--[[
+
 _G.main_env = getfenv(1) 
+
 
 --v function(level: int) --> number
 function get_exp_at_level(level)
@@ -12,3 +15,9 @@ exp_to_levels_table = {
   return exp_to_levels_table[level]
 end;
 _G.get_exp_at_level = get_exp_at_level
+
+
+
+SFOLOG("df library utilities init complete", "file.df_lib_resources")
+
+]]

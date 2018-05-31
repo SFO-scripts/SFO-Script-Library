@@ -109,7 +109,7 @@
 --# assume CM.callback: method(
 --#     callback: function(),
 --#     delay: number,
---#     name: string
+--#     name: string?
 --# )
 --# assume CM.repeat_callback: method(
 --#     callback: function(),
@@ -172,8 +172,11 @@
 --# assume CM.kill_character: method(lookup: string, kill_army: boolean, throughcq: boolean)
 --# assume CM.set_character_immortality: method(lookup: string, immortal: boolean)
 --# assume CM.faction_set_food_factor_value: method(name: string, factor: string, quantity: number)
-
-
+--# assume CM.force_add_skill: method(lookup: string, skill: string)
+--# assume CM.replenish_action_points: method(lookup: string)
+--# assume CM.is_multiplayer: method() --> boolean
+--# assume CM.scroll_camera_from_current: method(WHATEVER? ...)
+--# assume CM.create_force: method(WHATEVER? ...)
 
 -- CAMPAIGN UI MANAGER
 --# assume CUIM.get_char_selected: method() --> string
@@ -196,6 +199,9 @@
 --# assume CA_CHAR.rank: method() --> int
 --# assume CA_CHAR.character_subtype: method(subtype: string) --> boolean
 --# assume CA_CHAR.get_forename: method() --> string
+--# assume CA_CHAR.cqi: method() --> CA_CQI
+--# assume CA_CHAR.display_position_x: method() --> number
+--# assume CA_CHAR.display_position_y: method() --> number
 
 -- CHARACTER LIST
 --# assume CA_CHAR_LIST.num_items: method() --> number
@@ -277,11 +283,12 @@
 --# assume CA_FACTION.military_force_list: method() --> CA_MILITARY_FORCE_LIST
 --# assume CA_FACTION.is_human: method() --> boolean
 --# assume CA_FACTION.is_dead: method() --> boolean
---# assume CA_FACTION.is_vassal_of: method(faction: string) --> boolean
---# assume CA_FACTION.is_ally_vassal_or_client_state_of: method(faction: string) --> boolean
+--# assume CA_FACTION.is_vassal_of: method(faction: CA_FACTION) --> boolean
+--# assume CA_FACTION.is_ally_vassal_or_client_state_of: method(faction: CA_FACTION) --> boolean
 --# assume CA_FACTION.at_war_with: method(faction: string) --> boolean
 --# assume CA_FACTION.region_list: method() --> CA_REGION_LIST
 --# assume CA_FACTION.has_effect_bundle: method(bundle:string) --> boolean
+--# assume CA_FACTION.faction_leader: method() --> CA_CHAR
 
 -- FACTION LIST
 --# assume CA_FACTION_LIST.num_items: method() --> number

@@ -1,10 +1,12 @@
 _G.main_env = getfenv(1) 
 
-
-
-isLogAllowed = true --:boolean
-output("LOG SET TO"..tostring(isLogAllowed))
+-- debugging 
 isDebugSession = true --: boolean
+isLogAllowed = true --:boolean
+
+
+output("SFO: LOG SET TO"..tostring(isLogAllowed))
+
 
 
 --v function()
@@ -38,13 +40,15 @@ function SFOLOG(text, ftext)
   popLog :flush()
   popLog :close()
 end
+_G.SFOLOG = SFOLOG
 
---required library
-require("df_lib_resources")
-require("sfo")
+sfo_manager = require("sfo")
+sfo = sfo_manager.new()
+_G.sfo = sfo
 
-
-
+--[[ 
+  refreshes the log file at the start of each session
+]]
 
 core:add_listener(
   "SFO_REFRESH_LOG",
@@ -58,10 +62,41 @@ core:add_listener(
   end,
   true);
 
+
+--[[
+
+currently unused.
+
+--required library
+require("df_lib_resources")
+]]
+
+--[[
+  launches functions.
+
+]]
+
+core:add_listener(
+  "SFO_CORE_START",
+  "AllCaCallbacksFinished",
+  true,
+  function(context)
+    sfo:green_knight_experience()
+    sfo:lord_of_change_recruitment()
+  end,
+  true);
+
+
+
+
+
+
+
+
 if isDebugSession then
   cm:add_game_created_callback(
     function()
-
+      cm:faction_set_food_factor_value("wh_main_brt_bretonnia", "wh_dlc07_chivalry_war", 1000)
 
     end
   )

@@ -32,7 +32,7 @@ function sfo_manager.green_knight_experience(self)
             --# assume character: CA_CHAR
             if character:rank() < 40 then
                 SFOLOG("Leveling Up the Green Knight!", "listener.GreenKnightExp.callback(context)")
-				local char_str = char_lookup_str(character:cqi());
+				local char_str = cm:char_lookup_str(character:cqi());
 				
                 cm:add_agent_experience(char_str, 1151000);
                 cm:replenish_action_points(char_str);

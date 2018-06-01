@@ -1,11 +1,13 @@
 _G.main_env = getfenv(1) 
 
+
+
+
 -- debugging 
 isDebugSession = true --: boolean
 isLogAllowed = true --:boolean
 
 
-output("SFO: LOG SET TO"..tostring(isLogAllowed))
 
 
 
@@ -46,21 +48,21 @@ sfo_manager = require("sfo")
 sfo = sfo_manager.new()
 _G.sfo = sfo
 
+
+SFOLOGRESET()
+
+out("SFO: LOG SET TO"..tostring(isLogAllowed))
+if isDebugSession then
+  SFOLOG("DEBUG ACTIVE", "file.sfo_env_core")
+end
+
+
 --[[ 
   refreshes the log file at the start of each session
 ]]
 
-core:add_listener(
-  "SFO_REFRESH_LOG",
-  "UICreated",
-  true,
-  function(context)
-    SFOLOGRESET()
-    if isDebugSession then
-      SFOLOG("DEBUG ACTIVE", "file.sfo_env_core")
-    end
-  end,
-  true);
+
+
 
 
 --[[

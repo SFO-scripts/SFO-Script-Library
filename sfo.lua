@@ -176,19 +176,20 @@ function sfo_manager.karak_eight_peaks(self)
 		cm:force_make_trade_agreement("wh_main_dwf_karak_ziflin", "wh_main_emp_wissenland");		
 		cm:force_make_peace("wh_main_dwf_karak_ziflin", "wh_main_brt_bastonne");
         local clan_mors_character_list = clan_mors:character_list();
-		local mutenious_gits_character_list = mutenious_gits:character_list();
+		
 		local mutenious_gits_region_list = mutenious_gits:region_list();	
-		
-		for i = 0, mutenious_gits_character_list:num_items() - 1 do
-			cm:kill_character(mutenious_gits_character_list:item_at(i):cqi(), true, true);
+		cm:kill_all_armies_for_faction(mutenious_gits)
+        for i = 0, mutenious_gits_region_list:num_items() - 1 do
+            cm:callback(function()
+            cm:transfer_region_to_faction(mutenious_gits_region_list:item_at(i):name(), "wh2_main_skv_clan_mors");
+            end, (i+1)/10)
 		end;
-		
-		for i = 0, mutenious_gits_region_list:num_items() - 1 do
-			cm:transfer_region_to_faction(mutenious_gits_region_list:item_at(i):name(), "wh2_main_skv_clan_mors");
-		end;
-	
-		cm:transfer_region_to_faction("wh2_main_charnel_valley_karag_orrud", "wh2_main_grn_arachnos");		
-		cm:teleport_to(cm:char_lookup_str(cm:get_faction("wh2_main_skv_clan_mors"):faction_leader():command_queue_index()), 737, 262, true);	
+        cm:callback(function()
+        cm:transfer_region_to_faction("wh2_main_charnel_valley_karag_orrud", "wh2_main_grn_arachnos");		
+        end, 0.1)
+        cm:callback(function()
+        cm:teleport_to(cm:char_lookup_str(cm:get_faction("wh2_main_skv_clan_mors"):faction_leader():command_queue_index()), 737, 262, true);	
+        end, 0.1)
     elseif not skarsnik_human then
         local crooked_moon = cm:get_faction("wh_main_grn_crooked_moon");
 	    local mutenious_gits = cm:get_faction("wh_main_grn_necksnappers");	

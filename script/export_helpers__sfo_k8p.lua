@@ -9,12 +9,13 @@ function sfo_eight_peaks()
             cm:teleport_to(cm:char_lookup_str(102), 466, 403, false);
             cm:teleport_to(cm:char_lookup_str(12), 737, 262, false);	
             cm:teleport_to(cm:char_lookup_str(11), 739, 262, false);
-
-            cm:force_declare_war("wh_main_grn_crooked_moon", "wh_main_dwf_karak_azul", false, false);		
+            if not cm:is_multiplayer() then
+                cm:force_declare_war("wh_main_grn_crooked_moon", "wh_main_dwf_karak_azul", false, false);	
+                cm:force_declare_war("wh_main_dwf_karak_ziflin", "wh_dlc05_wef_wydrioth", false, false);
+            end
             cm:force_make_peace("wh_main_grn_crooked_moon", "wh_main_grn_necksnappers");
             cm:force_make_peace("wh_main_dwf_karak_izor", "wh_main_grn_necksnappers");
             cm:force_make_peace("wh2_main_skv_clan_mors", "wh_main_grn_necksnappers");
-            cm:force_declare_war("wh_main_dwf_karak_ziflin", "wh_dlc05_wef_wydrioth", false, false);
             cm:force_make_trade_agreement("wh_main_dwf_karak_ziflin", "wh_main_dwf_karak_norn");
             cm:force_make_trade_agreement("wh_main_dwf_karak_ziflin", "wh_main_emp_wissenland");
             cm:force_make_peace("wh_main_dwf_karak_ziflin", "wh_main_brt_bastonne");
@@ -28,12 +29,14 @@ function sfo_eight_peaks()
             local cqi = 102 --# assume cqi: CA_CQI
             cm:kill_character(cqi, true, true)
 
-            cm:force_declare_war("wh2_main_skv_clan_mors", "wh_main_dwf_karak_azul", false, false);		
+            if not cm:is_multiplayer() then
+                cm:force_declare_war("wh2_main_skv_clan_mors", "wh_main_dwf_karak_azul", false, false);	
+                cm:force_declare_war("wh_main_dwf_karak_ziflin", "wh_dlc05_wef_wydrioth", false, false);
+            end
             cm:force_make_peace("wh_main_grn_crooked_moon", "wh_main_grn_necksnappers");
             cm:force_make_peace("wh_main_dwf_karak_izor", "wh_main_grn_necksnappers");
             cm:force_make_peace("wh2_main_skv_clan_mors", "wh_main_grn_necksnappers");
             cm:force_make_peace("wh2_main_skv_clan_mors", "wh2_main_grn_arachnos");
-            cm:force_declare_war("wh_main_dwf_karak_ziflin", "wh_dlc05_wef_wydrioth", false, false);
             cm:force_make_trade_agreement("wh_main_dwf_karak_ziflin", "wh_main_dwf_karak_norn");
             cm:force_make_trade_agreement("wh_main_dwf_karak_ziflin", "wh_main_emp_wissenland");		
             cm:force_make_peace("wh_main_dwf_karak_ziflin", "wh_main_brt_bastonne");

@@ -104,6 +104,7 @@
 --# assume CA_UIC.SimulateKey: method(keyString: string)
 
 
+
 -- CAMPAIGN MANAGER
 --# assume CM.get_game_interface: method() --> CA_GAME
 --# assume CM.model: method() --> CA_MODEL
@@ -159,6 +160,15 @@
 --#     event_picture_id: number
 --#)
 
+--# assume CM.show_message_event: method(
+--#    faction_key: string,
+--#    primary_detail: string,
+--#    secondary_detail: string,
+--#    flavour_text: string,
+--#    show_immediately: boolean,
+--#    event_picture_id: number
+--#)
+
 --# assume CM.add_marker: method(
 --# name: string,
 --# marker_type: CA_MARKER_TYPE,
@@ -204,9 +214,12 @@
 --# assume CM.force_make_trade_agreement: method(faction1: string, faction2: string)
 --# assume CM.faction_has_trade_agreement_with_faction: method( first_faction: CA_FACTION, second_faction: CA_FACTION)
 --# assume CM.faction_has_nap_with_faction: method(first_faction: CA_FACTION, second_faction: CA_FACTION)
+--# assume CM.force_confederation: method(confederator: string, confederated: string)
 
 --# assume CM.pending_battle_cache_get_defender: method(pos: int) --> (CA_CQI, CA_CQI, string)
 --# assume CM.pending_battle_cache_get_attacker: method(pos: int) --> (CA_CQI, CA_CQI, string)
+--# assume CM.pending_battle_cache_get_enemies_of_char: method(char: CA_CHAR) --> vector<CA_CHAR>
+
 --# assume CM.force_change_cai_faction_personality: method(key: string, personality: string)
 --# assume CM.transfer_region_to_faction: method(region: string, faction:string)
 --# assume CM.award_experience_level: method(char_lookup_str: string, level: int)
@@ -218,7 +231,7 @@
 --# assume CM.get_faction: method(factionName: string) --> CA_FACTION
 --# assume CM.get_character_by_mf_cqi: method(cqi: CA_CQI) --> CA_CHAR
 --# assume CM.char_lookup_str: method(char: CA_CQI | CA_CHAR | number) --> string
---# assume CM.kill_all_armies_for_faction: method(factionName: CA_FACTION)
+--# assume CM.kill_all_armies_for_faction: method(factionName: string)
 --# assume CM.get_highest_ranked_general_for_faction: method(faction_key: string) --> CA_CHAR
 --# assume CM.force_add_and_equip_ancillary: method(lookup: string, ancillary: string)
 --# assume CM.trigger_dilemma: method(faction_key: string, dilemma_key: string, trigger_immediately: boolean)
@@ -231,8 +244,14 @@
 --# assume CM.replenish_action_points: method(lookup:string)
 --# assume CM.force_add_skill: method(lookup: string, skill_key: string)
 --# assume CM.scroll_camera_from_current: WHATEVER
+--# assume CM.treasury_mod: method(faction_key: string, quantity: number)
+--# assume CM.unlock_starting_general_recruitment: method(startpos: string, faction: string)
+
 --# assume CM.add_restricted_building_level_record: method(faction_key: string, building_key: string)
 --# assume CM.remove_restricted_building_level_record: method(faction_key: string, building_key: string)
+
+--# assume CM.win_next_autoresolve_battle: method(faction: string)
+--# assume CM.modify_next_autoresolve_battle: method(attacker_win_chance: number, defender_win_chance: number, attacker_losses_modifier: number, defender_losses_modifier: number, wipe_out_loser: boolean)
 
 -- CAMPAIGN UI MANAGER
 --# assume CUIM.get_char_selected: method() --> string
@@ -266,6 +285,10 @@
 --# assume CA_CHAR.is_faction_leader: method() --> boolean
 --# assume CA_CHAR.family_member: method() --> CA_CHAR
 
+--# assume CA_CHAR.in_settlement: method() --> boolean
+--# assume CA_CHAR.is_besieging: method() --> boolean
+
+
 -- CHARACTER LIST
 --# assume CA_CHAR_LIST.num_items: method() --> number
 --# assume CA_CHAR_LIST.item_at: method(index: number) --> CA_CHAR
@@ -285,6 +308,9 @@
 --# assume CA_UNIT.unit_key: method() --> string
 --# assume CA_UNIT.has_force_commander: method() --> boolean
 --# assume CA_UNIT.force_commander: method() --> CA_CHAR
+--# assume CA_UNIT.military_force: method() --> CA_MILITARY_FORCE
+--# assume CA_UNIT.has_military_force: method() --> boolean
+--# assume CA_UNIT.percentage_proportion_of_full_strength: method() --> number
 
 
 --UNIT_LIST
@@ -295,22 +321,37 @@
 
 -- REGION
 --# assume CA_REGION.settlement: method() --> CA_SETTLEMENT
+--# assume CA_REGION.garrison_residence: method() --> CA_GARRISON_RESIDENCE
 --# assume CA_REGION.name: method() --> string
+--# assume CA_REGION.province_name: method() --> string
+--# assume CA_REGION.public_order: method() --> number
 --# assume CA_REGION.is_null_interface: method() --> boolean
 --# assume CA_REGION.is_abandoned: method() --> boolean
 --# assume CA_REGION.owning_faction: method() --> CA_FACTION
 --# assume CA_REGION.slot_list: method() --> CA_SLOT_LIST
 --# assume CA_REGION.is_province_capital: method() --> boolean
 --# assume CA_REGION.building_exists: method(building: string) --> boolean
+--# assume CA_REGION.resource_exists: method(resource_key: string) --> boolean
+--# assume CA_REGION.any_resource_available: method() --> boolean
+--# assume CA_REGION.adjacent_region_list: method() --> CA_REGION_LIST
 
 -- SETTLEMENT
 --# assume CA_SETTLEMENT.logical_position_x: method() --> number
 --# assume CA_SETTLEMENT.logical_position_y: method() --> number
 --# assume CA_SETTLEMENT.get_climate: method() --> string
 --# assume CA_SETTLEMENT.is_null_interface: method() --> boolean
+--# assume CA_SETTLEMENT.faction: method() -->CA_FACTION
+--# assume CA_SETTLEMENT.commander: method() --> CA_CHAR
+--# assume CA_SETTLEMENT.has_commander: method() --> boolean
+--# assume CA_SETTLEMENT.slot_list: method() --> CA_SLOT_LIST
+--# assume CA_SETTLEMENT.is_port: method() --> boolean
+--# assume CA_SETTLEMENT.region: method() --> CA_REGION
+
 --SLOT LIST
 --# assume CA_SLOT_LIST.num_items: method() --> number
 --# assume CA_SLOT_LIST.item_at: method(index: number) --> CA_SLOT
+--# assume CA_SLOT_LIST.slot_type_exists: method(slot_key: string) --> boolean
+--# assume CA_SLOT_LIST.building_type_exists: method(building_key: string) --> boolean
 
 --SLOT
 --# assume CA_SLOT.has_building: method() --> boolean
@@ -332,6 +373,8 @@
 --# assume CA_GARRISON_RESIDENCE.settlement_interface: method() --> CA_SETTLEMENT
 --# assume CA_GARRISON_RESIDENCE.army: method() --> CA_MILITARY_FORCE
 --# assume CA_GARRISON_RESIDENCE.command_queue_index: method() --> CA_CQI
+--# assume CA_GARRISON_RESIDENCE.unit_count: method() --> number
+--# assume CA_GARRISON_RESIDENCE.can_be_occupied_by_faction: method(faction_key: string) --> boolean
 
 -- MODEL
 --# assume CA_MODEL.world: method() --> CA_WORLD
@@ -358,7 +401,7 @@
 --# assume CA_REGION_MANAGER.region_by_key: method(key: string) --> CA_REGION
 
 
--- FACTION
+-- FACTIOM
 --# assume CA_FACTION.character_list: method() --> CA_CHAR_LIST
 --# assume CA_FACTION.treasury: method() --> number
 --# assume CA_FACTION.name: method() --> string
@@ -370,6 +413,7 @@
 --# assume CA_FACTION.is_vassal_of: method(faction: string) --> boolean
 --# assume CA_FACTION.is_vassal: method() --> boolean
 --# assume CA_FACTION.is_ally_vassal_or_client_state_of: method(faction: string) --> boolean
+--# assume CA_FACTION.allied_with: method(faction: CA_FACTION)
 --# assume CA_FACTION.at_war_with: method(faction: CA_FACTION) --> boolean
 --# assume CA_FACTION.region_list: method() --> CA_REGION_LIST
 --# assume CA_FACTION.has_effect_bundle: method(bundle:string) --> boolean
@@ -377,6 +421,8 @@
 --# assume CA_FACTION.command_queue_index: method() --> CA_CQI
 --# assume CA_FACTION.is_null_interface: method() --> boolean
 --# assume CA_FACTION.faction_leader: method() --> CA_CHAR
+--# assume CA_FACTION.has_home_region: method() --> boolean
+--# assume CA_FACTION.factions_met: method() --> CA_FACTION_LIST
 
 -- FACTION LIST
 --# assume CA_FACTION_LIST.num_items: method() --> number
@@ -422,18 +468,21 @@
 --# assume global print_all_uicomponent_children: function(component: CA_UIC)
 --# assume global is_uicomponent: function(object: any) --> boolean
 --# assume global output_uicomponent: function(uic: CA_UIC, omit_children: boolean)
---# assume global faction_is_horde: function(faction: CA_FACTION) --> boolean
+--# assume global wh_faction_is_horde: function(faction: CA_FACTION) --> boolean
 --# assume global uicomponent_to_str: function(component: CA_UIC) --> string
 --# assume global is_string: function(arg: string) --> boolean
 --# assume global is_table: function(arg: table) --> boolean
 --# assume global is_number: function(arg: number) --> boolean
 --# assume global is_function: function(arg: function) --> boolean
+--# assume global is_boolean: function(arg: boolean) --> boolean
 --# assume global get_timestamp: function() --> string
 --# assume global script_error: function(msg: string)
 --# assume global to_number: function(n: any) --> number
+--# assume global load_script_libraries: function()
 
 -- CAMPAIGN
 --# assume global get_cm: function() --> CM
+--# assume global get_events: function() --> map<string, vector<function(context:WHATEVER?)>>
 --# assume global Get_Character_Side_In_Last_Battle: function(char: CA_CHAR) --> BATTLE_SIDE
 --# assume global q_setup: function()
 --# assume global set_up_rank_up_listener: function(quest_table: vector<vector<string | number>>, subtype: string, infotext: vector<string | number>)
@@ -456,15 +505,38 @@
 
 --# assume global class MISSION_MANAGER
 --# type global CA_MISSION_OBJECTIVE =
---# "CAPTURE_REGIONS"
+--# "CAPTURE_REGIONS" | "SCRIPTED"
 
+--creation
 --# assume MISSION_MANAGER.new: method(faction_key: string, mission_key: string, success_callback: function?, failure_callback: function?, cancellation_callback: function?) --> MISSION_MANAGER
+
+--basic
 --# assume MISSION_MANAGER.add_new_objective: method(objective_type: CA_MISSION_OBJECTIVE)
 --# assume MISSION_MANAGER.add_condition: method(condition_string: string)
 --# assume MISSION_MANAGER.add_payload: method(payload_string: string)
---# assume MISSION_MANAGER.set_should_cancel_before_issuing: method(boolean?)
---# assume MISSION_MANAGER.trigger: method(dismiss_callback: function?, delay: number?)
+--# assume MISSION_MANAGER.set_turn_limit: method(turns: number)
+--# assume MISSION_MANAGER.set_chapter: method(turns: integer)
+--# assume MISSION_MANAGER.set_mission_issuer: method(issuer: string)
+--localisation
+--# assume MISSION_MANAGER.add_heading: method(heading_loc_key: string)
+--# assume MISSION_MANAGER.add_description: method(description_loc_key: string)
+--scripted objectives
+------Here, string key can be ommited when creating an objective. This will generate it randomly. The script key can only be ommitted from other functions if there is only one scripted objective.
+--# assume MISSION_MANAGER.add_new_scripted_objective: method(objective_loc_key: string, event: string, condition: function(context: WHATEVER) --> boolean, script_key: string?)
+--# assume MISSION_MANAGER.add_scripted_objective_success_condition: method(event: string, condition: function(context: WHATEVER) --> boolean, script_key: string?)
+--# assume MISSION_MANAGER.add_scripted_objective_failure_condition: method(event: string, condition: function(context: WHATEVER) --> boolean, script_key: string?)
+--# assume MISSION_MANAGER.force_scripted_objective_success: method(script_key: string?)
+--# assume MISSION_MANAGER.force_scripted_objective_failure: method(script_key: string?)
+--# assume MISSION_MANAGER.update_scripted_objective_text: method(override_text_loc: string, script_key: string?)
 
+--# assume MISSION_MANAGER.set_should_cancel_before_issuing: method(boolean)
+--# assume MISSION_MANAGER.set_should_should_whitelist: method(boolean)
+
+--# assume MISSION_MANAGER.set_first_time_startup_callback: method(callback: function())
+--# assume MISSION_MANAGER.set_each_time_startup_callback: method(callback: function())
+
+--# assume MISSION_MANAGER.trigger: method(dismiss_callback: function?, delay: number?)
+--# assume CM.get_mission_manager: method(mission_key: string) --> MISSION_MANAGER
 
 
 
@@ -479,3 +551,4 @@
 --# assume global __write_output_to_logfile: boolean
 --# assume global mission_manager: MISSION_MANAGER
 --# assume global rite_unlock: RITE_UNLOCK
+--# assume global events: map<string, vector<function(context:WHATEVER?)>>

@@ -1,4 +1,4 @@
-
+cm = get_cm() events = get_events() rm = _G.rm
 local units = {
 {"wh_main_emp_inf_greatswords", "emp_special"},
 {"wh_main_emp_cav_reiksguard", "emp_special"},
@@ -196,7 +196,7 @@ local units = {
 {"wh2_dlc09_tmb_mon_ushabti_1", "tmb_elite"},
 {"wh2_dlc09_tmb_mon_heirotitan_0", "tmb_rare"},
 {"wh2_dlc09_tmb_mon_necrosphinx_0", "tmb_rare"},
-{"wh2_dlc09_tmb_veh_khemrian_warsphinx_0", "tmb_rare"},
+{"wh2_dlc09_tmb_veh_khemrian_warsphinx_0", "tmb_rare"}
 } --:vector<{string, string}>
 
 local groups = {} --:map<string, boolean>
@@ -270,12 +270,14 @@ local function sfo_add_unit_caps()
 end
 --v function()
 function sfo_apply_cap_bundle()
-    local SFO_UNIT_CAPS_EFFECT_BUNDLE = "VENRIS_ADD"
+    local SFO_UNIT_CAPS_EFFECT_BUNDLE = "cap_factionwide"
 
 
-    local factions_list = cm:model():world():factions_list()
-    for i = 0, factions_list:num_items() - 1 do
-        cm:apply_effect_bundle(SFO_UNIT_CAPS_EFFECT_BUNDLE, faction_list:item_at(i):name(), 0)
+    local faction_list = cm:model():world():faction_list()
+    for i = 0, faction_list:num_items() - 1 do
+        if not faction_list:item_at(i):is_dead() then
+            cm:apply_effect_bundle(SFO_UNIT_CAPS_EFFECT_BUNDLE, faction_list:item_at(i):name(), 0)
+        end
     end
 
 
@@ -298,4 +300,5 @@ core:add_listener(
         end
     end,
     false)
-
+    
+    

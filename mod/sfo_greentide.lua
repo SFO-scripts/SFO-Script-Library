@@ -10,8 +10,6 @@ function greentide_tracker.init()
     })--# assume self: GT_TRACKER
 
     self._levels = {} --:map<string, number> --faction, level
-    self._dilemmas = {} --:vector<string>
-
     _G.gt = self
 end
 

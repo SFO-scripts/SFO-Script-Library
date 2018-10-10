@@ -30,9 +30,54 @@ function greentide_tracker.apply_value_change(self, faction, value, event)
         end
         cm:apply_effect_bundle("grn_greentide_"..new_level, faction, 0)
     end
-    if new_level > old_level then
-        cm:trigger_dilemma("grn_greentide_choice_"..event, faction, true)
-    end
+    if cm:get_faction(faction):is_human() then
+        if new_level > old_level then
+            cm:trigger_dilemma("grn_greentide_choice_"..event, faction, true)
+            core:add_listener(
+                "GTDilemmaChoiceMade",
+                "DilemmaChoiceMadeEvent",
+                function(context)
+                    return context:dilemma() == "grn_greentide_choice_"..event
+                end,
+                function(context)
+                    cm:show_message_event(
+                        faction,
+                        "wh_event_feed_scripted_message_grn_upgrade_primary_detail",
+                        "wh_event_feed_scripted_message_grn_upgrade_primary_detail",
+                        "wh_event_feed_scripted_message_grn_upgrade_secondary_detail",
+                        true,
+                        593)
+                end,
+                false)
+            elseif old_level > new_level then
+                if cm:model():world():whose_turn_is_it():name() == faction then
+                cm:show_message_event(
+                    faction,
+                    "wh_event_feed_scripted_message_grn_nerf_primary_detail",
+                    "wh_event_feed_scripted_message_grn_nerf_primary_detail",
+                    "wh_event_feed_scripted_message_grn_nerf_secondary_detail",
+                    true,
+                    593) 
+                else
+                    core:add_listener(
+                        "GTFactionTurnStart",
+                        "FactionTurnStart",
+                        function(context)
+                            return context:faction():name() == faction
+                        end,
+                        function(context)
+                            cm:show_message_event(
+                                faction,
+                                "wh_event_feed_scripted_message_grn_nerf_primary_detail",
+                                "wh_event_feed_scripted_message_grn_nerf_primary_detail",
+                                "wh_event_feed_scripted_message_grn_nerf_secondary_detail",
+                                true,
+                                593) 
+                        end,
+                        false)
+                end
+            end
+        end
     self._levels[faction] = new_level
     cm:set_saved_value("gt_tracker_"..faction, new_level)
 end

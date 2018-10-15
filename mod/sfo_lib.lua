@@ -13,19 +13,19 @@ local function SFOLOGRESET()
     popLog :close()
 end
 
---v function(text: string, ftext: string)
+--v function(text: string, ftext: string?)
 local function SFOLOG(text, ftext)
     if not __write_output_to_logfile then
-      return;
+        return; 
     end
-  local logText = tostring(text)
-  local logContext = tostring(ftext)
-  local logTimeStamp = os.date("%d, %m %Y %X")
-  local popLog = io.open("sfo_log.txt","a")
-  --# assume logTimeStamp: string
-  popLog :write("SFO:  "..logText .. "    : [" .. logContext .. "] : [".. logTimeStamp .. "]\n")
-  popLog :flush()
-  popLog :close()
+
+    local logText = tostring(text)
+    local logTimeStamp = os.date("%d, %m %Y %X")
+    local popLog = io.open("sfo_log.txt","a")
+    --# assume logTimeStamp: string
+    popLog :write("SFO:  [".. logTimeStamp .. "]:  "..logText .. "  \n")
+    popLog :flush()
+    popLog :close()
 end
 
 

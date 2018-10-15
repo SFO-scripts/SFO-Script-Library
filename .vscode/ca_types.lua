@@ -505,7 +505,7 @@
 --# assume CORE.remove_listener: method(listenerName: string)
 --# assume CORE.add_ui_created_callback: method(function())
 --# assume CORE.get_screen_resolution: method() --> (number, number)
---# assume CORE.trigger_event: method(event_name: string)
+--# assume CORE.trigger_event: method(event_name: string, any...)
 
 -- POOLED RESOURCE
 --# assume CA_POOLED.value: method() --> number

@@ -1,5 +1,13 @@
+--SCRIPT LIBRARY
+--Contains utility functions such as: logging, error checking, and version number
+--It isn't very interesting
+--Written by Drunk Flamingo
+--Last updated 10/15/18
+
+--# assume global class SFO_MANAGER
 local sfo_util = {} --# assume sfo_util: SFO_MANAGER
 
+--resets the log on session start.
 local function SFOLOGRESET()
     if not __write_output_to_logfile then
         return;
@@ -13,6 +21,7 @@ local function SFOLOGRESET()
     popLog :close()
 end
 
+--log script to text
 --v function(text: string, ftext: string?)
 local function SFOLOG(text, ftext)
     if not __write_output_to_logfile then
@@ -29,8 +38,8 @@ local function SFOLOG(text, ftext)
 end
 
 
-
---v function() 
+--instantiate manager
+--v function() --> SFO_MANAGER
 function sfo_util.init()
     SFOLOGRESET()
     local self = {}
@@ -38,91 +47,63 @@ function sfo_util.init()
         __index = sfo_util,
         __tostring = function() return "SFO_UTILITY" end
     }) --# assume self: SFO_MANAGER
-    self._logLastContext = "No Context Set" --:string
+    -- version warnings
+    self._versionSV = "SFO_PUBLIC_VERSION"
+    if not cm:get_saved_value(self._versionSV) then
+        cm:set_saved_value(self._versionSV, "1.5")
+    end
+    self.versionNum = cm:get_saved_value(self._versionSV) --:string
 
 
     _G.sfo = self
+    return self
 end
 
---v function(self: SFO_MANAGER, ftext: string)
-function sfo_util.set_log_context(self, ftext)
-    self.logLastContext = ftext
-end
-
---v function(self: SFO_MANAGER) --> string
-function sfo_util.log_context(self)
-    return self._logLastContext
-end
-
-
+--log script to text
 --v function(self: SFO_MANAGER, text: any, ftext: any?)
 function sfo_util.log(self, text, ftext)
-    if ftext then
-        self:set_log_context(tostring(ftext))
-    end
-    SFOLOG(tostring(text), self:log_context())
+    --ftext is no longer used, but is allowed as an unused arg for this function so I don't have to go back and edit logs
+    SFOLOG(tostring(text))
 end
 
+--Error checker. Wraps all listeners and callbacks in a safecall.
+--Here there be monsters! Kailua strongly dislikes the way this is done and *will* complain. NOCHECK. 
 --v [NO_CHECK] function(self: SFO_MANAGER)
 function sfo_util.enable_error_checker(self)   
-    --Vanish's PCaller
-    --All credits to vanish
+
+    --safely calls a function
     --v function(func: function) --> any
     function safeCall(func)
-        --output("safeCall start");
         local status, result = pcall(func)
         if not status then
-            SFOLOG(tostring(result), "ERROR CHECKER")
-            SFOLOG(debug.traceback(), "ERROR CHECKER");
+            SFOLOG("ERROR: ")
+            SFOLOG(tostring(result))
+            SFOLOG(debug.traceback());
         end
-        --output("safeCall end");
         return result;
     end
     
-    --local oldTriggerEvent = core.trigger_event;
-    
+    --packs a function's args
     --v [NO_CHECK] function(...: any)
     function pack2(...) return {n=select('#', ...), ...} end
+    --unpacks a function's args into a vector
     --v [NO_CHECK] function(t: vector<WHATEVER>) --> vector<WHATEVER>
     function unpack2(t) return unpack(t, 1, t.n) end
     
+    --wraps a function in SafeCall
     --v [NO_CHECK] function(f: function(), argProcessor: function()) --> function()
     function wrapFunction(f, argProcessor)
         return function(...)
-            --output("start wrap ");
             local someArguments = pack2(...);
             if argProcessor then
                 safeCall(function() argProcessor(someArguments) end)
             end
             local result = pack2(safeCall(function() return f(unpack2( someArguments )) end));
-            --for k, v in pairs(result) do
-            --    output("Result: " .. tostring(k) .. " value: " .. tostring(v));
-            --end
-            --output("end wrap ");
             return unpack2(result);
             end
     end
     
-    -- function myTriggerEvent(event, ...)
-    --     local someArguments = { ... }
-    --     safeCall(function() oldTriggerEvent(event, unpack( someArguments )) end);
-    -- end
-    
-    --v [NO_CHECK] function(fileName: string)
-    function tryRequire(fileName)
-        local loaded_file = loadfile(fileName);
-        if not loaded_file then
-            output("Failed to find mod file with name " .. fileName)
-        else
-            output("Found mod file with name " .. fileName)
-            output("Load start")
-            local local_env = getfenv(1);
-            setfenv(loaded_file, local_env);
-            loaded_file();
-            output("Load end")
-        end
-    end
-    
+    --used to log the calls of a function when debugging. Unused in live versions.
     --v [NO_CHECK] function(f: function(), name: string)
     function logFunctionCall(f, name)
         return function(...)
@@ -131,6 +112,7 @@ function sfo_util.enable_error_checker(self)
         end
     end
     
+    --logs the available methods of an object, then logs future calls to that object.
     --v [NO_CHECK] function(object: any)
     function logAllObjectCalls(object)
         local metatable = getmetatable(object);
@@ -138,7 +120,7 @@ function sfo_util.enable_error_checker(self)
             if is_function(f) then
                 output("Found " .. name);
                 if name == "Id" or name == "Parent" or name == "Find" or name == "Position" or name == "CurrentState"  or name == "Visible"  or name == "Priority" or "Bounds" then
-                    --Skip
+                    --Skip UI functions
                 else
                     metatable[name] = logFunctionCall(f, name);
                 end
@@ -155,31 +137,20 @@ function sfo_util.enable_error_checker(self)
         end
     end
     
-    -- logAllObjectCalls(core);
-    -- logAllObjectCalls(cm);
-    -- logAllObjectCalls(game_interface);
-    
+    --wrap trigger event
     core.trigger_event = wrapFunction(
         core.trigger_event,
         function(ab)
-            --output("trigger_event")
-            --for i, v in pairs(ab) do
-            --    output("i: " .. tostring(i) .. " v: " .. tostring(v))
-            --end
-            --output("Trigger event: " .. ab[1])
         end
     );
-    
+    --wrap check callbacks
     cm.check_callbacks = wrapFunction(
         cm.check_callbacks,
         function(ab)
-            --output("check_callbacks")
-            --for i, v in pairs(ab) do
-            --    output("i: " .. tostring(i) .. " v: " .. tostring(v))
-            --end
         end
     )
-    
+
+    --wrap Listeners
     local currentAddListener = core.add_listener;
     --v [NO_CHECK] function(core: any, listenerName: any, eventName: any, conditionFunc: any, listenerFunc: any, persistent: any)
     function myAddListener(core, listenerName, eventName, conditionFunc, listenerFunc, persistent)
@@ -196,13 +167,16 @@ function sfo_util.enable_error_checker(self)
         )
     end
     core.add_listener = myAddListener;
+
 end
 
-
+--show that SFO is active in the CA script log.
+--lets other modders know we exist when debugging.
+--v function()
 function sfo_lib()
     out("********************")
     out("SFO LIBRARIES LOADED")
     out("********************")
 end
 
-sfo_util.init()
+sfo_util.init():enable_error_checker() -- launch the library with error checking attached!

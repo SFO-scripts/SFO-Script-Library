@@ -1,10 +1,13 @@
 -- Greentide EBS
 -- Written by Drunk Flamingo
--- Original version for Norsca Patch Written 15/10/18
+-- Original version for SFO1.5 Written 15/10/18
+
+--deps
 local gt = _G.gt
 local sfo = _G.sfo
 local events = get_events()
 
+--global constants that impact script behaviour
 SFO_CONST_GRN_NUM_TURNS_BEFORE_DECAY = 8
 SFO_CONST_GRN_NUM_SLAUGHTERS = 3
 SFO_CONST_GRN_RANK_FOR_LEVEL = 7
@@ -12,7 +15,10 @@ SFO_CONST_GRN_NUM_BATTLES = 10
 SFO_CONST_GRN_NUM_SACKS = 3
 SFO_CONST_GRN_NUM_AGENT_ACTS = 3
 
+--struct: defines the necessary args to add an event 
 --# type global GT_EVENT = {event: string, condition: (function(context: WHATEVER) --> boolean), faction: (function(context: WHATEVER) --> string), value: number}
+
+--list of events to add.
 local gt_events = {
     --won a battle
     {
@@ -235,13 +241,13 @@ local gt_events = {
 }--:vector<GT_EVENT>
 
     
-
+--add the events 
 for i = 1, #gt_events do
     local current = gt_events[i]
     gt:add_event(current.event, current.condition, current.faction, current.value)
 end
 
-
+--when the world is created, attempt to load greentide values for all factions, and set a default on factions who don't have anything saved.
 events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function() 
     local faction_list = cm:model():world():faction_list()
     for i = 0, faction_list:num_items() - 1 do
@@ -259,7 +265,8 @@ events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = functi
     end
 end;
 
-
+--create a listener to spawn a "lost battle" event.
+--CharacterCompletedBattle only triggers for characters who survive, so this method is safer when trying to track losses.
 core:add_listener(
     "GTSupplementCharacterLostBattle",
     "CharacterCompletedBattle",
@@ -280,3 +287,22 @@ core:add_listener(
     end,
     true
 )
+
+--show an explanation on first launch that involves this mechanic
+events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function() 
+    if not cm:get_saved_value("GTAdviceDisplayed") then
+        local humans = cm:get_human_factions()
+        for i = 1, #humans do
+            if cm:get_faction(humans[i]):culture() == "wh_main_grn_greenskins" then
+                cm:show_message_event(
+                    humans[i],
+                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_start_primary_detail",
+                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_start_primary_detail",
+                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_start_secondary_detail",
+                    true,
+                    593)
+            end
+        end
+        cm:set_saved_value("GTAdviceDisplayed", true)
+    end
+end;

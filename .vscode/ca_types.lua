@@ -472,7 +472,7 @@
 --# assume CA_FACTION.pooled_resource: method(resource: string) --> CA_POOLED
 --# assume CA_FACTION.rituals: method() --> CA_FACTION_RITUALS
 --# assume CA_FACTION.has_rituals: method() --> boolean
-
+--# assume CA_FACTION.holds_entire_province: method(province_key: string, include_vassals: boolean)
 
 -- FACTION LIST
 --# assume CA_FACTION_LIST.num_items: method() --> number

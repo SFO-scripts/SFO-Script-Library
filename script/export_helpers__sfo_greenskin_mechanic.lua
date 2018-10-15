@@ -1,6 +1,12 @@
 local gt = _G.gt
 local sfo = _G.sfo
 local events = get_events()
+
+SFO_CONST_NUM_TURNS_BEFORE_DECAY = 8
+SFO_CONST_NUM_SLAUGHTERS = 3
+SFO_CONST_RANK_FOR_LEVEL = 7
+
+
 --# type global GT_EVENT = {event: string, condition: (function(context: WHATEVER) --> boolean), faction: (function(context: WHATEVER) --> string), value: number}
 local gt_events = {
     --won a battle
@@ -34,7 +40,7 @@ local gt_events = {
         event = "CharacterRankUp",
         condition = function(context --:WHATEVER
         )
-            return context:character():rank() == 7
+            return context:character():rank() == SFO_CONST_RANK_FOR_LEVEL
         end,
         faction = function(context --:WHATEVER
         )
@@ -110,7 +116,7 @@ local gt_events = {
             end
             val = cm:get_saved_value("GTCharacterPostBattleSlaughter")
             val = val + 1
-            if val >= 3 then
+            if val >= SFO_CONST_NUM_SLAUGHTERS then
                 cm:set_saved_value("GTCharacterPostBattleSlaughter", 0)
                 return true
             else
@@ -146,7 +152,7 @@ local gt_events = {
             end
             val = cm:get_saved_value("GTFactionTurnStart"..context:faction():name())
             val = val + 1
-            if val >= 8 then
+            if val >= SFO_CONST_NUM_TURNS_BEFORE_DECAY then
                 cm:set_saved_value("GTFactionTurnStart"..context:faction():name(), 0)
                 return true
             else

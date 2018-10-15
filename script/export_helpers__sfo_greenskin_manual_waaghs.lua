@@ -1,10 +1,20 @@
 local sfo = _G.sfo
 local events = get_events()
 ---[[mr. venris edit this 
-local grn_units = {
+local spawn_units = {
+    regular = {
     "wh_main_grn_mon_trolls", 
-    "wh_main_grn_mon_trolls"
-}--:vector<string>
+    "wh_main_grn_mon_trolls" 
+    },
+    savage_orcs = {
+        "wh_main_grn_mon_trolls", 
+        "wh_main_grn_mon_trolls" 
+    },
+    crooked_moon = {
+        "wh_main_grn_mon_trolls", 
+        "wh_main_grn_mon_trolls" 
+    }
+}--:{regular: vector<string>, savage_orcs: vector<string>, crooked_moon: vector<string>}
 SFO_CONST_WAAGH_SIZE_BASE = 13 --:number
 SFO_CONST_WAAGH_SIZE_VARIANCE = 6 --:number
 SFO_CONST_WAAGH_ARMY_BUNDLE = "grn_greentide_manual_waagh" --:string
@@ -19,7 +29,12 @@ local function sfo_spawn_waaagh(faction)
         sfo:log("Failed to find a home region for spawning!")
         return
     end
-
+    local grn_units = spawn_units.regular
+    if faction:subculture() == "wh_main_sc_grn_savage_orcs" then
+        grn_units = spawn_units.savage_orcs
+    elseif faction:name() == "wh_main_grn_crooked_moon" then
+        grn_units = spawn_units.crooked_moon
+    end
     local unit_list = grn_units[cm:random_number(#grn_units)]
     for i = 1, SFO_CONST_WAAGH_SIZE_BASE + cm:random_number(SFO_CONST_WAAGH_SIZE_VARIANCE) - 1 do
         unit_list = unit_list .. ",".. grn_units[cm:random_number(#grn_units)]

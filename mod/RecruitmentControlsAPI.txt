@@ -1,0 +1,101 @@
+
+Public API functions
+
+--------------------------------------------------------
+MAIN API: Commands to register units and give them caps. 
+
+Command: 
+	rm:add_unit_to_group("unit_key", "group_key")
+Description
+	Adds a unit to a group with that key. The group can be literally any string, its just a string match. If the group hasn't been used before the script will autocreate it.
+	--note: all units must be added to the group before the group's quantity limit is set.
+	
+Command:
+	rm:add_character_quantity_limit_for_group("group_key", ##quantity##)
+Description:
+	Sets the quantity limit for units in that group.
+	
+Command: 
+	rm:add_character_quantity_limit_for_unit("unit_key", ##quantity##)
+Description:
+	Sets the quantity limit for a specific unit. 
+	Keep in mind that unit weight doesn't matter here, only in groups. If the unit has weight 3, I don't need to set the limit at 9 to get three of them. 
+	
+Command:
+	rm:whitelist_unit_for_subculture("unit_key", "sc_key")
+Description:
+	Sets the unit to only be checked by that subculture. If nothing is set then every subculture will check those units. 
+	This can cause noticable lag if a subculture is checking more than 250 units, which is why this whitelist exists.
+
+Command:
+	rm:set_weight_for_unit("unit_key", ##weight##)
+Description:
+	Sets a in group weight for the unit. This causes the unit to count for multiple in groups. 
+	--note: mild bugs as of 7/26, still working on the restriction enforcement.
+	
+Command:
+	rm:add_unit_to_already_initialized_group("unit_key", "group_key")
+Description:
+	Adds a unit to a group and functions properly even if that group's cap has already been set.
+	Do not do this for large numbers of units unless you want to increase the player's loading time. For small numbers it is fine, but > 30 will be a problem.
+	Why? Because I've got to completely deconstruct the check queue for that unit and any others in the group then reconstruct them each time this is called. 
+
+--------------------------------------------------------
+UI API: to add some better user feedback to the settings.
+
+Command: 
+	rm:set_ui_profile_for_unit("unit_key", {_text = "Tooltip Text", _image = "ui/custom/example_image.png"})
+Description:
+	Sets a image with a tooltip to appear on the unit card. the _text piece is the tooltip, while the _image piece is the path to the image you want displayed. 
+	This will only display on the unit card in the recruitment menu, not everywhere. 
+	
+Command:
+	rm:set_ui_name_for_group("group_key", "Group Name")
+Description:
+	Sets the UI name of the group. This can make things look nicer if your group name is something like emp_steam_tanks. 
+
+-------------------------------------------------------
+OVERRIDE API: To add overrides based on specific lords.
+Command:
+	rm:add_subtype_group_override("agent_subtype_key", "unit_key", "new_group_key", {
+		_text = "Override Tooltip Text",
+		_image = "ui/custom/example_image.png"
+	})
+Description:
+	Sets a unit to be treated as a member of a certain group only for lords of a certain subtype.
+	Will use the provided tooltip image and text instead of the default.
+
+Command:
+	rm:add_subtype_skill_weight_override("agent_subtype_key", "unit_key", "skill_key", ##new_weight##, {
+		_text = "Override Tooltip Text",
+		_image = "ui/custom/example_image.png"
+	})
+Description: 
+	Sets a unit to be treated with a different weight based on a skill for a certain subtype.
+	Will use the provided tooltip if and only if the skill applies. 
+	Cannot be used multiple times on the same unit for the same subtype. Limitation includes trait version.
+
+Command:
+	rm:add_subtype_trait_weight_override("agent_subtype_key", "unit_key", "trait_key", ##new_weight##, {
+		_text = "Override Tooltip Text",
+		_image = "ui/custom/example_image.png"
+	})
+Description: 
+	Sets a unit to be treated with a different weight based on a trait for a certain subtype.
+	Will use the provided tooltip if and only if the trait applies. 
+	Cannot be used multiple times on the same unit for the same subtype. Limitation includes trait version.
+
+
+--OTHER API: Other useful functions
+-----------------------------------
+
+Command:
+	rm:error_checker()
+Description:
+	Wraps listener functions in pcall with logging. 
+	Useful for finding script errors.
+	
+Command: 
+	rm:log("message")
+Description:
+	Writes a message to the RM log. Useful if you want your functions to show on that log.

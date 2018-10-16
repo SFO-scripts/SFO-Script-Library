@@ -122,12 +122,14 @@
 --# assume CM.disable_end_turn: method(opt: boolean)
 --# assume CM.disable_shortcut: method(button: string, action: string, opt: boolean)
 --# assume CM.override_ui: method(override: string, opt: boolean)
+--# assume CM.steal_user_input: method(opt: bool)
 --callbacks
 --# assume CM.callback: method(
 --#     callback: function(),
 --#     delay: number?,
 --#     name: string?
 --# )
+--# assume CM.remove_callback: method(name: string)
 --# assume CM.repeat_callback: method(
 --#     callback: function(),
 --#     delay: number,
@@ -324,6 +326,7 @@
 --# assume CA_CHAR.is_faction_leader: method() --> boolean
 --# assume CA_CHAR.family_member: method() --> CA_CHAR
 --# assume CA_CHAR.is_null_interface: method() --> boolean
+--# assume CA_CHAR.has_skill: method(skill_key: string) --> boolean
 
 -- CHARACTER LIST
 --# assume CA_CHAR_LIST.num_items: method() --> number

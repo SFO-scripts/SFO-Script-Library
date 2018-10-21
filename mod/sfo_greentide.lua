@@ -138,9 +138,9 @@ function greentide_tracker.apply_value_change(self, faction, value, event)
                 --show a message
                 cm:show_message_event(
                     faction,
-                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..string.lower(event).."_primary_detail",
-                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..string.lower(event).."_primary_detail",
-                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..string.lower(event).."_secondary_detail",
+                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_primary_detail",
+                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_primary_detail",
+                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_secondary_detail",
                     true,
                     593) 
             else
@@ -154,9 +154,9 @@ function greentide_tracker.apply_value_change(self, faction, value, event)
                     function(context)
                         cm:show_message_event(
                             faction,
-                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..string.lower(event).."_primary_detail",
-                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..string.lower(event).."_primary_detail",
-                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..string.lower(event).."_secondary_detail",
+                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_primary_detail",
+                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_primary_detail",
+                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_secondary_detail",
                             true,
                             593) 
                     end,

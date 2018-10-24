@@ -179,7 +179,15 @@ core:add_listener(
 	end,
 	true);
 
-
+core:add_listener(
+	"GrudgeCancelled",
+	"MissionCancelled",
+	true,
+	function(context)
+		GRULOG("Grudge Cancelled listener fired")
+		grudge_rewards(context);
+	end,
+	true);
 
 
 

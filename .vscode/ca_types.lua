@@ -215,6 +215,9 @@
 --#    otherName: string, age: int, male: boolean, agentKey: string, agent_subtypeKey: string, 
 --#    isImmortal: boolean, artSetId: string
 --#)
+--# assume CM.create_agent: method(
+--# faction_key: string, agent_key: string, subtype_key: string, x: number, y:number, cq: boolean,callback: (function(CA_CQI))?
+--#)
 --saving and loading
 --# assume CM.add_saving_game_callback: method(function(context: WHATEVER))
 --# assume CM.add_loading_game_callback: method(function(context: WHATEVER))

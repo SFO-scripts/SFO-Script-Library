@@ -78,6 +78,8 @@ function greentide_tracker.apply_value_change(self, faction, value, event)
     if cm:get_faction(faction):is_human() then
         --if the change is an increase.
         if new_level > old_level then
+            --reset the turn counter for the decay
+            cm:set_saved_value("GTFactionTurnStart"..faction, 0)
             --check if it is the correct turn
             if cm:model():world():whose_turn_is_it():name() == faction then
                 --trigger the associated dilemma.

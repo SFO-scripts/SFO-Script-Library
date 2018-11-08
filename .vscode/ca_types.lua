@@ -678,3 +678,8 @@
 --# assume global invasion_manager: INVASION_MANAGER
 
 --string extensions
+
+--v [string_meta] function(self: string, start: string) --> boolean
+function string.starts_with(self, start)
+    return true
+end

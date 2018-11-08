@@ -18,4 +18,3 @@ require("script/export_helpers__sfo_groups")
 require("script/export_helpers__sfo_greenskin_mechanic")
 require("script/export_helpers__sfo_greenskin_manual_waaghs")
 require("script/export_helpers__sfo_character_spawns")
-

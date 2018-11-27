@@ -1,7 +1,6 @@
 --# assume global class RECRUITER_MANAGER
 --# assume global class RECRUITER_CHARACTER
 --# type global RM_UIPROFILE = {_image: string, _text: string}
-
 --Log script to text
 --v function(text: string | number | boolean | CA_CQI)
 local function RCLOG(text)
@@ -130,6 +129,8 @@ function recruiter_manager.init()
     --another flag, this one says whether or not the damn thing is a pirate ship.
     self._charHordeSubtypes = {} --:map<string, boolean>
     self._AIDefaultUnits = {} --:map<string, vector<string>>
+    self._enforce = true --:boolean
+    self._AIEnforce = true --:boolean
     --place instance in _G. 
     _G.rm = self
 end
@@ -304,6 +305,31 @@ function recruiter_manager.error_checker(self)
         end
         core.add_listener = myAddListener;
 end
+-------------------------
+--functionality toggles--
+-------------------------
+
+--v function(self: RECRUITER_MANAGER) --> boolean
+function recruiter_manager.should_enforce_restrictions(self)
+    return self._enforce
+end
+
+--v function(self: RECRUITER_MANAGER, enforce: boolean)
+function recruiter_manager.enforce_restrictions(self, enforce)
+    self._enforce = enforce
+end
+
+--v function(self: RECRUITER_MANAGER) --> boolean
+function recruiter_manager.should_enforce_ai_restrictions(self)
+    return self._AIEnforce
+end
+
+--v function(self: RECRUITER_MANAGER, enforce: boolean)
+function recruiter_manager.enforce_ai_restrictions(self, enforce)
+    self._AIEnforce = enforce
+end
+
+
 
 --group ui names--
 ------------------
@@ -824,6 +850,9 @@ end
 --enforce the restriction for a specific unit onto the UI.
 --v function(self: RECRUITER_CHARACTER, unitID: string)
 function recruiter_character.enforce_unit_restriction(self, unitID)
+    if not self:manager():should_enforce_restrictions() then
+        return
+    end
     char = cm:get_character_by_cqi(self:cqi())
     local is_cbh = self:manager():is_subtype_char_horde(char:character_subtype_key())
     local in_foreign_land = (char:region():is_null_interface() or char:region():owning_faction():name() ~= char:faction():name())
@@ -1834,5 +1863,4 @@ end
 
 --initialize the rm 
 recruiter_manager.init()
-
 

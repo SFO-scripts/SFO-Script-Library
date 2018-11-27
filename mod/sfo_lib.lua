@@ -53,7 +53,7 @@ function sfo_util.init()
         cm:set_saved_value(self._versionSV, "1.5")
     end
     self.versionNum = cm:get_saved_value(self._versionSV) --:string
-
+    self._settings = nil --:MCM_MOD
 
     _G.sfo = self
     return self
@@ -167,7 +167,15 @@ function sfo_util.enable_error_checker(self)
         )
     end
     core.add_listener = myAddListener;
+end
 
+--access the settings
+--v function(self: SFO_MANAGER, mcm: MCM) --> MCM_MOD
+function sfo_util.get_settings(self, mcm)
+    if self._settings == nil then
+        self._settings = mcm:register_mod("steel_faith_overhaul", "Steel Faith Overhaul", "Settings for Steel Faith Overhaul")
+    end
+    return self._settings
 end
 
 --show that SFO is active in the CA script log.

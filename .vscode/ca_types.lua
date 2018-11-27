@@ -135,6 +135,7 @@
 --# assume CM.get_camera_position: method() --> (number, number, number, number)
 --# assume CM.fade_scene: method(unknown: number, unknown2: number)
 --callbacks
+--# assume CM.first_tick_callbacks: vector<(function(context: WHATEVER?))>
 --# assume CM.add_game_created_callback: method(callback: function)
 --# assume CM.callback: method(
 --#     callback: function(),
@@ -206,8 +207,7 @@
 --#     region_key: string,
 --#     xPos: number,
 --#     yPos: number,
---#     un1: boolean,
---#     un2: boolean,
+--#     exclude_named: boolean,
 --#     callback: (function(CA_CQI))?
 --# )
 --# assume CM.spawn_character_to_pool: method(
@@ -576,7 +576,6 @@
 
 -- CAMPAIGN
 --# assume global get_cm: function() --> CM
---# assume global get_events: function() --> map<string, vector<function(context:WHATEVER?)>>
 --# assume global Get_Character_Side_In_Last_Battle: function(char: CA_CHAR) --> BATTLE_SIDE
 --# assume global q_setup: function()
 --# assume global set_up_rank_up_listener: function(quest_table: vector<vector<string | number>>, subtype: string, infotext: vector<string | number>)

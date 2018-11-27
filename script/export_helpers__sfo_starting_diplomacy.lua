@@ -1,8 +1,9 @@
-events = get_events(); cm = get_cm(); sfo = _G.sfo
+cm = get_cm(); sfo = _G.sfo
 
 local function sfo_starting_diplomacy()
     sfo:log("Setting starting diplomacy", "sfo_starting_diplomacy")
 
+	cm:force_make_peace("wh_main_grn_crooked_moon", "wh_main_emp_wissenland");
 	cm:force_make_peace("wh_dlc08_nor_norsca", "wh_main_brt_bretonnia");
 	cm:force_make_peace("wh_main_emp_marienburg", "wh_main_brt_bretonnia");	
 	cm:force_make_peace("wh_main_brt_carcassonne", "wh2_main_hef_yvresse");
@@ -12,8 +13,6 @@ local function sfo_starting_diplomacy()
 	cm:force_make_trade_agreement("wh_main_brt_lyonesse", "wh2_main_hef_cothique");		
 
 	cm:force_make_trade_agreement("wh_main_teb_estalia", "wh2_main_hef_yvresse");
-	cm:force_make_trade_agreement("wh_main_teb_estalia", "wh2_main_emp_new_world_colonies");
-	cm:force_make_trade_agreement("wh_main_teb_tilea", "wh2_main_emp_new_world_colonies");
 
 	cm:force_make_peace("wh_main_emp_empire", "wh_main_grn_skull-takerz");		
 	cm:force_make_peace("wh_main_emp_middenland", "wh_main_grn_skull-takerz");
@@ -31,12 +30,15 @@ local function sfo_starting_diplomacy()
 		cm:force_declare_war("wh_dlc08_nor_vanaheimlings", "wh_main_brt_bretonnia", false, false);
 	end
 
+if not cm:get_saved_value("Faction_Unlocker") then
+        cm:force_make_trade_agreement("wh_main_teb_estalia", "wh2_main_emp_new_world_colonies");
+        cm:force_make_trade_agreement("wh_main_teb_tilea", "wh2_main_emp_new_world_colonies");
+    end
+
     sfo:log("starting diplomacy set without error.", "sfo_starting_diplomacy")
 end
 
-
-
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function() 
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
     if cm:is_new_game() then
         sfo_starting_diplomacy()
     end

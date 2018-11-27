@@ -1,4 +1,5 @@
-events = get_events(); cm = get_cm(); sfo = _G.sfo
+cm = get_cm(); sfo = _G.sfo;
+
 local function sfo_everwatcher()
 if cm:get_saved_value("sfo_lord_of_change_given") == true then
     sfo:log("The lord of change was already defeated, aborting listener setup", "sfo_lord_of_change")
@@ -20,6 +21,6 @@ core:add_listener(
 end
 
 
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function() 
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
     sfo_everwatcher()
 end;

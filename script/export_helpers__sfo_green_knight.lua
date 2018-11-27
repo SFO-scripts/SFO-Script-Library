@@ -1,4 +1,6 @@
-cm = get_cm(); events = get_events(); sfo =_G.sfo
+--[[
+
+cm = get_cm(); sfo =_G.sfo
 
 local function sfo_green_knight()
     sfo:log("Removing the vanilla Green Knight listener and creating a new one.", "sfo_green_knight")
@@ -34,6 +36,8 @@ local function sfo_green_knight()
         true);
 end
 
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function() 
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
     sfo_green_knight()
 end;
+
+--]]

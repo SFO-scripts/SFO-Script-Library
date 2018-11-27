@@ -1,4 +1,4 @@
-events = get_events(); cm = get_cm(); sfo = _G.sfo
+cm = get_cm(); sfo = _G.sfo
 
 function sfo_eight_peaks()
     if cm:is_new_game() then
@@ -61,7 +61,7 @@ function sfo_eight_peaks()
 end
 
 
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function() 
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
     if cm:is_new_game() then
         sfo_eight_peaks()
     end

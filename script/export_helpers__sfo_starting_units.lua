@@ -1,25 +1,24 @@
+cm = get_cm(); sfo = _G.sfo
 CONST_SFO_STARTING_UNITS = {
-    ["wh_main_emp_empire"] = {
-        "wh_main_emp_inf_greatswords",
-        "wh_main_emp_inf_greatswords"
+    ["wh_main_emp_middenland"] = {
+        "emp_wolf_knight",
+        "emp_wolf_knight"
     },
-    ["wh_main_dwf_dwarfs"] = {
-        "wh_main_dwf_inf_longbeards_1"
+    ["wh2_main_skv_clan_mors"] = {
+        "wh2_main_skv_inf_stormvermin_0",
+        "wh2_main_skv_inf_stormvermin_0"
+    },
+    ["wh2_main_lzd_last_defenders"] = {
+        "wh2_main_lzd_mon_carnosaur_blessed_0"
     }
 } --:map<string, vector<string>>
 
 CONST_SFO_REMOVE_UNITS = {
-    ["wh_main_emp_empire"] = {
-        "wh_main_emp_inf_greatswords",
-        "wh_main_emp_inf_greatswords"
-    },
-    ["wh_main_dwf_dwarfs"] = {
-        "wh_main_dwf_inf_longbeards_1"
-    }
+
 } --:map<string, vector<string>>
 
 
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function() 
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
     _G.sfo:log("Checking to grant units")
     if cm:is_new_game() then
         for faction_key, units in pairs(CONST_SFO_STARTING_UNITS) do
@@ -44,5 +43,4 @@ events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = functi
         end
     end
 end;
-
 

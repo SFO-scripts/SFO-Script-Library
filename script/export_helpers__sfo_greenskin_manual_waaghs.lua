@@ -1,22 +1,55 @@
-local sfo = _G.sfo
-local events = get_events()
+cm = get_cm(); sfo = _G.sfo
 ---[[mr. venris edit this 
 local spawn_units = {
     regular = {
-    "wh_main_grn_mon_trolls", 
-    "wh_main_grn_mon_trolls" 
+    "wh_main_grn_inf_orc_boyz", 
+    "wh_main_grn_inf_orc_boyz", 
+    "wh_main_grn_inf_orc_boyz", 
+    "wh_main_grn_inf_orc_boyz", 
+    "wh_main_grn_inf_orc_boyz", 
+    "wh_main_grn_inf_orc_boyz", 
+    "wh_main_grn_inf_orc_arrer_boyz", 
+    "wh_main_grn_inf_orc_arrer_boyz",
+    "wh_main_grn_inf_orc_arrer_boyz",
+    "wh_main_grn_cav_orc_boar_boyz", 
+    "wh_main_grn_cav_orc_boar_boyz", 
+    "wh_main_grn_cav_orc_boar_boyz", 
+    "wh_main_grn_cav_orc_boar_chariot"
     },
     savage_orcs = {
-        "wh_main_grn_mon_trolls", 
-        "wh_main_grn_mon_trolls" 
+    "wh_main_grn_inf_savage_orcs",
+    "wh_main_grn_inf_savage_orcs",
+    "wh_main_grn_inf_savage_orcs",
+    "wh_main_grn_inf_savage_orcs",
+    "wh_main_grn_inf_savage_orcs",
+    "wh_main_grn_inf_savage_orcs",
+    "wh_main_grn_cav_savage_orc_boar_boyz",
+    "wh_main_grn_cav_savage_orc_boar_boyz",
+    "wh_main_grn_inf_savage_orc_arrer_boyz",
+    "wh_main_grn_inf_savage_orc_arrer_boyz"
     },
     crooked_moon = {
-        "wh_main_grn_mon_trolls", 
-        "wh_main_grn_mon_trolls" 
+    "wh_main_grn_inf_goblin_spearmen",
+    "wh_main_grn_inf_goblin_spearmen",
+    "wh_main_grn_inf_goblin_spearmen",
+    "wh_main_grn_inf_goblin_spearmen",
+    "wh_main_grn_inf_goblin_spearmen",
+    "wh_main_grn_inf_goblin_archers",
+    "wh_main_grn_inf_goblin_archers",
+    "wh_main_grn_inf_goblin_archers",
+    "wh_dlc06_grn_inf_nasty_skulkers_0",
+    "wh_dlc06_grn_inf_nasty_skulkers_0",
+    "wh_dlc06_grn_inf_squig_herd_0",
+    "wh_dlc06_grn_inf_squig_herd_0",
+    "wh_main_grn_cav_goblin_wolf_riders_0",
+    "wh_main_grn_cav_goblin_wolf_riders_0",
+    "wh_main_grn_cav_goblin_wolf_riders_1",
+    "wh_main_grn_cav_goblin_wolf_riders_1",
+    "wh_main_grn_art_goblin_rock_lobber"
     }
 }--:{regular: vector<string>, savage_orcs: vector<string>, crooked_moon: vector<string>}
-SFO_CONST_WAAGH_SIZE_BASE = 13 --:number
-SFO_CONST_WAAGH_SIZE_VARIANCE = 6 --:number
+SFO_CONST_WAAGH_SIZE_BASE = 19 --:number
+SFO_CONST_WAAGH_SIZE_VARIANCE = 0 --:number
 SFO_CONST_WAAGH_ARMY_BUNDLE = "grn_greentide_manual_waagh" --:string
 SFO_CONST_WAAGH_BUNDLE_TIMER = 0 --:number --set to 0 for infinite
 --]]
@@ -46,7 +79,6 @@ local function sfo_spawn_waaagh(faction)
         home_region:name(),
         home_region:settlement():logical_position_x() - 1,
         home_region:settlement():logical_position_y() + 1,
-        true,
         true,
         function(cqi)
             cm:apply_effect_bundle_to_characters_force(SFO_CONST_WAAGH_ARMY_BUNDLE, cqi, 0, true)

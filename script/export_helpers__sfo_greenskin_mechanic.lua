@@ -4,16 +4,15 @@
 
 --deps
 local gt = _G.gt
-local sfo = _G.sfo
-local events = get_events()
+cm = get_cm(); sfo = _G.sfo
 
 --global constants that impact script behaviour
-SFO_CONST_GRN_NUM_TURNS_BEFORE_DECAY = 8
-SFO_CONST_GRN_NUM_SLAUGHTERS = 3
-SFO_CONST_GRN_RANK_FOR_LEVEL = 7
+SFO_CONST_GRN_NUM_TURNS_BEFORE_DECAY = 20
+SFO_CONST_GRN_NUM_SLAUGHTERS = 10
+SFO_CONST_GRN_RANK_FOR_LEVEL = 15
 SFO_CONST_GRN_NUM_BATTLES = 10
-SFO_CONST_GRN_NUM_SACKS = 3
-SFO_CONST_GRN_NUM_AGENT_ACTS = 3
+SFO_CONST_GRN_NUM_SACKS = 10
+SFO_CONST_GRN_NUM_AGENT_ACTS = 5
 
 --struct: defines the necessary args to add an event 
 --# type global GT_EVENT = {event: string, condition: (function(context: WHATEVER) --> boolean), faction: (function(context: WHATEVER) --> string), value: number}
@@ -144,6 +143,7 @@ local gt_events = {
             return (context:technology() == "grn_gob" or
             context:technology() == "grn_orc" or
             context:technology() == "grn_sav" or
+            context:technology() == "tech_grn_main_1_4" or
             context:technology() == "grn_tech")
         end,
         faction = function(context --:WHATEVER
@@ -248,7 +248,7 @@ for i = 1, #gt_events do
 end
 
 --when the world is created, attempt to load greentide values for all factions, and set a default on factions who don't have anything saved.
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function() 
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
     local faction_list = cm:model():world():faction_list()
     for i = 0, faction_list:num_items() - 1 do
         local faction = faction_list:item_at(i)
@@ -289,7 +289,7 @@ core:add_listener(
 )
 
 --show an explanation on first launch that involves this mechanic
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function() 
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
     if not cm:get_saved_value("GTAdviceDisplayed") then
         local humans = cm:get_human_factions()
         for i = 1, #humans do
@@ -297,7 +297,7 @@ events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = functi
                 cm:show_message_event(
                     humans[i],
                     "event_feed_strings_text_wh_event_feed_scripted_message_grn_start_primary_detail",
-                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_start_primary_detail",
+                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_start_minor_detail",
                     "event_feed_strings_text_wh_event_feed_scripted_message_grn_start_secondary_detail",
                     true,
                     593)

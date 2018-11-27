@@ -78,8 +78,6 @@ function greentide_tracker.apply_value_change(self, faction, value, event)
     if cm:get_faction(faction):is_human() then
         --if the change is an increase.
         if new_level > old_level then
-            --reset the turn counter for the decay
-            cm:set_saved_value("GTFactionTurnStart"..faction, 0)
             --check if it is the correct turn
             if cm:model():world():whose_turn_is_it():name() == faction then
                 --trigger the associated dilemma.
@@ -95,7 +93,7 @@ function greentide_tracker.apply_value_change(self, faction, value, event)
                         cm:show_message_event(
                             faction,
                             "event_feed_strings_text_wh_event_feed_scripted_message_grn_upgrade_primary_detail",
-                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_upgrade_primary_detail",
+                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_upgrade_minor_detail",
                             "event_feed_strings_text_wh_event_feed_scripted_message_grn_upgrade_secondary_detail",
                             true,
                             593)
@@ -123,7 +121,7 @@ function greentide_tracker.apply_value_change(self, faction, value, event)
                                     cm:show_message_event(
                                         faction,
                                         "event_feed_strings_text_wh_event_feed_scripted_message_grn_upgrade_primary_detail",
-                                        "event_feed_strings_text_wh_event_feed_scripted_message_grn_upgrade_primary_detail",
+                                        "event_feed_strings_text_wh_event_feed_scripted_message_grn_upgrade_minor_detail",
                                         "event_feed_strings_text_wh_event_feed_scripted_message_grn_upgrade_secondary_detail",
                                         true,
                                         593)
@@ -141,7 +139,7 @@ function greentide_tracker.apply_value_change(self, faction, value, event)
                 cm:show_message_event(
                     faction,
                     "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_primary_detail",
-                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_primary_detail",
+                    "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_minor_detail",
                     "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_secondary_detail",
                     true,
                     593) 
@@ -157,7 +155,7 @@ function greentide_tracker.apply_value_change(self, faction, value, event)
                         cm:show_message_event(
                             faction,
                             "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_primary_detail",
-                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_primary_detail",
+                            "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_minor_detail",
                             "event_feed_strings_text_wh_event_feed_scripted_message_grn_nerf_"..(event).."_secondary_detail",
                             true,
                             593) 

@@ -1,17 +1,17 @@
 --log script to text
 --v function(text: any)
 function GRULOG(text)
-    if not __write_output_to_logfile then
-        return; 
-    end
+	if not __write_output_to_logfile then
+		return; 
+	end
 
-    local logText = tostring(text)
-    local logTimeStamp = os.date("%d, %m %Y %X")
-    local popLog = io.open("sfo_log.txt","a")
-    --# assume logTimeStamp: string
-    popLog :write("GRU:  [".. logTimeStamp .. "]:  "..logText .. "  \n")
-    popLog :flush()
-    popLog :close()
+	local logText = tostring(text)
+	local logTimeStamp = os.date("%d, %m %Y %X")
+	local popLog = io.open("warhammer_expanded_log.txt","a")
+	--# assume logTimeStamp: string
+	popLog :write("GOC:  [".. logTimeStamp .. "]:  "..logText .. "  \n")
+	popLog :flush()
+	popLog :close()
 end
 
 --Struct: defines the info needed for a mission. Objective field references a CA enum. 
@@ -67,9 +67,11 @@ grudge_objective_list_faction = {
 
 --v function(faction_key: string)
 local function grudge_issuer(faction_key)
+
 	--disable all events before triggering grudges.
 	cm:disable_event_feed_events(true, "", "wh_event_subcategory_faction_missions_objectives", "");
 	GRULOG("The issuer function is running");
+	--find a grudge list for the faction
 	grudge_objective_list = nil --:vector<BOG_MISSION_REC>
 	if grudge_objective_list_faction[faction_key] ~= nil then
 		grudge_objective_list = grudge_objective_list_faction[faction_key];
@@ -135,7 +137,7 @@ end;
 local function grudge_rewards(context)
 
 	local faction_key = context:faction():name() --:string
-	local mission_key = context:mission():mission_record_key() --:string
+	local mission_key = context:mission():mission_record_key() 
 	if cm:get_saved_value("saved_grudge_completed") == nil then
 		cm:set_saved_value("saved_grudge_completed", 0);
 	end
@@ -170,9 +172,7 @@ end;
 core:add_listener(
 	"Grudge_Succeeded",
 	"MissionSucceeded",
-	function(context)
-		return context:mission():mission_record_key():starts_with("df_grudge")
-	end,
+	true,
 	function(context)
 		GRULOG("Grudge_Succeeded listener fired")
 		grudge_rewards(context);
@@ -182,9 +182,7 @@ core:add_listener(
 core:add_listener(
 	"GrudgeCancelled",
 	"MissionCancelled",
-	function(context)
-		return context:mission():mission_record_key():starts_with("df_grudge")
-	end,
+	true,
 	function(context)
 		GRULOG("Grudge Cancelled listener fired")
 		grudge_rewards(context);
@@ -193,29 +191,23 @@ core:add_listener(
 
 
 
-local events = get_events()
-events.FirstTickAfterWorldCreated[#events.FirstTickAfterWorldCreated+1] = function()
+
+	cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
 	GRULOG("the grudges custom script launched");
 	cm:set_saved_value("df_grudges_dwf", true);
 	
-	local ok, err = pcall(function()
-		if cm:is_new_game() == true then
-			--if one of these two is human, modify diplo
-			if cm:get_faction("wh_main_dwf_dwarfs"):is_human() or cm:get_faction ("wh_main_dwf_karak_izor"):is_human() then 
-				df_diplomacy_setup();
-			end
-			--run the script for all dwarfs
-			local humans = cm:get_human_factions() 
-			for i = 1, #humans do
-				if cm:get_faction(humans[i]):culture() == "wh_main_dwf_dwarfs" then
-					grudge_issuer(humans[i])
-				end
+
+	if cm:is_new_game() == true then
+		--if one of these two is human, modify diplo
+		if cm:get_faction("wh_main_dwf_dwarfs"):is_human() or cm:get_faction ("wh_main_dwf_karak_izor"):is_human() then 
+			df_diplomacy_setup();
+		end
+		--run the script for all dwarfs
+		local humans = cm:get_human_factions() 
+		for i = 1, #humans do
+			if cm:get_faction(humans[i]):culture() == "wh_main_dwf_dwarfs" then
+				grudge_issuer(humans[i])
 			end
 		end
-	end)
-	if not ok then
-		--# assume err: string
-		GRULOG("error in book of grudges!")
-		GRULOG(tostring(err))
 	end
 end

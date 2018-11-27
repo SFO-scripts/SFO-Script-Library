@@ -181,6 +181,9 @@ local gt_events = {
         event = "CharacterCharacterTargetAction",
         condition = function(context --:WHATEVER
         )
+            if context:character():faction():name() == context:target_character():faction():name() then
+                return false
+            end
             if context:mission_result_success() or context:mission_result_critial_success() then
                 local sv_string = "GTCharacterCharacterTargetAction"..context:character():faction():name()
                 if not cm:get_saved_value(sv_string) then

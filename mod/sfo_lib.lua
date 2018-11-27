@@ -178,6 +178,15 @@ function sfo_util.get_settings(self, mcm)
     return self._settings
 end
 
+--v function(self: SFO_MANAGER) --> boolean
+function sfo_util.save_has_mcm(self)
+    if self._settings == nil then
+        return false
+    else
+        return self._settings:model():started_with_mod("steel_faith_overhaul")
+    end
+end
+
 --show that SFO is active in the CA script log.
 --lets other modders know we exist when debugging.
 --v function()

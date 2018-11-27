@@ -60,9 +60,21 @@ function sfo_eight_peaks()
     end
 end
 
-
+local mcm = _G.mcm
 cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
-    if cm:is_new_game() then
-        sfo_eight_peaks()
+    if (not mcm) or (not sfo:save_has_mcm()) then 
+        if cm:is_new_game() then
+            sfo_eight_peaks()
+        end
+    else
+        local sfo_set = sfo:get_settings(mcm)
+        local eight_peak = sfo_set:add_tweaker("eight_peaks", "Move Eight Peaks Characters", "Moves Skarsnik to Eight peaks when he is not played. Moves Queek to Eight Peaks when he is.")
+        eight_peak:add_option("move", "Enabled", "Move the Eight Peaks characters at campaign start")
+        eight_peak:add_option("stay", "Disabled", "Do not move the Eight Peaks characters at campaign start")
+        mcm:add_new_game_only_callback(function(context) 
+            if sfo:get_settings(mcm):get_tweaker_with_key("eight_peaks"):selected_option():name() == "move" then
+                sfo_eight_peaks()
+            end
+        end)
     end
 end;

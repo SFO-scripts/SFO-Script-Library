@@ -36,6 +36,7 @@
     --// The value is easily accessible within this event through tonumber(context.string)
 --# assume MCM_MOD.get_variable_with_key: method(key: string) --> MCM_VAR
 --# assume MCM_MOD.get_tweaker_with_key: method(key: string) --> MCM_TWEAKER
+--# assume MCM_MOD.model: method() --> MCM
 
 --TWEAKER OBJECT
 --# assume MCM_TWEAKER.name: method() -->string

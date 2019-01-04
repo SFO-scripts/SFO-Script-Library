@@ -69,7 +69,7 @@ grudge_objective_list_faction = {
 local function grudge_issuer(faction_key)
 
 	--disable all events before triggering grudges.
-	cm:disable_event_feed_events(true, "", "wh_event_subcategory_faction_missions_objectives", "");
+	
 	GRULOG("The issuer function is running");
 	--find a grudge list for the faction
 	grudge_objective_list = nil --:vector<BOG_MISSION_REC>
@@ -78,10 +78,9 @@ local function grudge_issuer(faction_key)
 		GRULOG("found a list for your faction, proceeding");
 	else
 		GRULOG("can't find a list for your faction");
-		cm:callback(function() cm:disable_event_feed_events(false, "", "wh_event_subcategory_faction_missions_objectives", "") end, 1);
 		return
 	end
-
+	cm:disable_event_feed_events(true, "", "wh_event_subcategory_faction_missions_objectives", "");
 	local grudge_list_count = #grudge_objective_list;
 	--apply all grudges
 	for i = 1, grudge_list_count do
@@ -175,7 +174,12 @@ core:add_listener(
 	true,
 	function(context)
 		GRULOG("Grudge_Succeeded listener fired")
+		local ok, err = pcall(function()
 		grudge_rewards(context);
+		end)
+		if not ok then
+			GRULOG(tostring(err))
+		end
 	end,
 	true);
 
@@ -185,29 +189,40 @@ core:add_listener(
 	true,
 	function(context)
 		GRULOG("Grudge Cancelled listener fired")
-		grudge_rewards(context);
+		local ok, err = pcall(function()
+			grudge_rewards(context);
+			end)
+			if not ok then
+				GRULOG(tostring(err))
+			end
 	end,
 	true);
 
 
 
 
-	cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
-	GRULOG("the grudges custom script launched");
-	cm:set_saved_value("df_grudges_dwf", true);
-	
-
-	if cm:is_new_game() == true then
-		--if one of these two is human, modify diplo
-		if cm:get_faction("wh_main_dwf_dwarfs"):is_human() or cm:get_faction ("wh_main_dwf_karak_izor"):is_human() then 
-			df_diplomacy_setup();
-		end
-		--run the script for all dwarfs
-		local humans = cm:get_human_factions() 
-		for i = 1, #humans do
-			if cm:get_faction(humans[i]):culture() == "wh_main_dwf_dwarfs" then
-				grudge_issuer(humans[i])
+cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
+	local ok, err = pcall(function()
+		GRULOG("the grudges custom script launched");
+		cm:set_saved_value("df_grudges_dwf", true);
+		if cm:is_new_game() == true and cm:model():campaign_name("main_warhammer") then
+			--if one of these two is human, modify diplo
+			if cm:get_faction("wh_main_dwf_dwarfs"):is_human() or cm:get_faction ("wh_main_dwf_karak_izor"):is_human() then 
+				df_diplomacy_setup();
+			end
+			--run the script for all dwarfs
+			local humans = cm:get_human_factions() 
+			for i = 1, #humans do
+				if cm:get_faction(humans[i]):culture() == "wh_main_dwf_dwarfs" then
+					grudge_issuer(humans[i])
+				end
 			end
 		end
+	end)
+	if not ok then 
+		GRULOG("error")
+		GRULOG(tostring(err))
 	end
 end
+
+

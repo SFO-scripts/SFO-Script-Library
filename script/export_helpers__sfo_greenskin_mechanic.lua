@@ -7,14 +7,12 @@ local gt = _G.gt
 cm = get_cm(); sfo = _G.sfo
 
 --global constants that impact script behaviour
-local gt_set = {}
-gt_set.NUM_TURNS_BEFORE_DECAY = 12 --:number
-gt_set.NUM_SLAUGHTERS = 10
-gt_set.RANK_FOR_LEVEL = 15
-gt_set.NUM_BATTLES = 10
-gt_set.NUM_SACKS = 10
-gt_set.NUM_AGENT_ACTS = 5
-gt_set.AI_SWARM = false --:boolean
+SFO_CONST_GRN_NUM_TURNS_BEFORE_DECAY = 20
+SFO_CONST_GRN_NUM_SLAUGHTERS = 10
+SFO_CONST_GRN_RANK_FOR_LEVEL = 15
+SFO_CONST_GRN_NUM_BATTLES = 10
+SFO_CONST_GRN_NUM_SACKS = 10
+SFO_CONST_GRN_NUM_AGENT_ACTS = 5
 
 --struct: defines the necessary args to add an event 
 --# type global GT_EVENT = {event: string, condition: (function(context: WHATEVER) --> boolean), faction: (function(context: WHATEVER) --> string), value: number}
@@ -33,7 +31,7 @@ local gt_events = {
                 end
                 local val = cm:get_saved_value(sv_string)
                 val = val + 1
-                if val >= gt_set.NUM_BATTLES then
+                if val >= SFO_CONST_GRN_NUM_BATTLES then
                     cm:set_saved_value(sv_string, 0)
                     return true
                 else
@@ -66,7 +64,7 @@ local gt_events = {
         event = "CharacterRankUp",
         condition = function(context --:WHATEVER
         )
-            return context:character():rank() == gt_set.RANK_FOR_LEVEL
+            return context:character():rank() == SFO_CONST_GRN_RANK_FOR_LEVEL
         end,
         faction = function(context --:WHATEVER
         )
@@ -101,7 +99,7 @@ local gt_events = {
             end
             local val = cm:get_saved_value(sv_string)
             val = val + 1
-            if val >= gt_set.NUM_SACKS then
+            if val >= SFO_CONST_GRN_NUM_SACKS then
                 cm:set_saved_value(sv_string, 0)
                 return true
             else
@@ -165,7 +163,7 @@ local gt_events = {
             end
             val = cm:get_saved_value(sv_string)
             val = val + 1
-            if val >= gt_set.NUM_SLAUGHTERS then
+            if val >= SFO_CONST_GRN_NUM_SLAUGHTERS then
                 cm:set_saved_value(sv_string, 0)
                 return true
             else
@@ -183,9 +181,6 @@ local gt_events = {
         event = "CharacterCharacterTargetAction",
         condition = function(context --:WHATEVER
         )
-            if context:character():faction():name() == context:target_character():faction():name() then
-                return false
-            end
             if context:mission_result_success() or context:mission_result_critial_success() then
                 local sv_string = "GTCharacterCharacterTargetAction"..context:character():faction():name()
                 if not cm:get_saved_value(sv_string) then
@@ -193,7 +188,7 @@ local gt_events = {
                 end
                 local val = cm:get_saved_value(sv_string)
                 val = val + 1
-                if val >= gt_set.NUM_AGENT_ACTS then
+                if val >= SFO_CONST_GRN_NUM_AGENT_ACTS then
                     cm:set_saved_value(sv_string, 0)
                     return true
                 else
@@ -213,14 +208,11 @@ local gt_events = {
         event = "FactionTurnStart",
         condition = function(context --:WHATEVER
         )
-            if not context:faction():is_human() then
-                return false
-            end
             if not cm:get_saved_value("GTFactionTurnStart"..context:faction():name()) then
                 cm:set_saved_value("GTFactionTurnStart"..context:faction():name(), 0)
             end
             val = cm:get_saved_value("GTFactionTurnStart"..context:faction():name())
-            if val >= gt_set.NUM_TURNS_BEFORE_DECAY then
+            if val >= SFO_CONST_GRN_NUM_TURNS_BEFORE_DECAY then
                 cm:set_saved_value("GTFactionTurnStart"..context:faction():name(), 0)
                 return true
             else
@@ -249,7 +241,11 @@ local gt_events = {
 }--:vector<GT_EVENT>
 
     
-
+--add the events 
+for i = 1, #gt_events do
+    local current = gt_events[i]
+    gt:add_event(current.event, current.condition, current.faction, current.value)
+end
 
 --when the world is created, attempt to load greentide values for all factions, and set a default on factions who don't have anything saved.
 cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
@@ -259,13 +255,6 @@ cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context)
         if gt:is_valid_greentide_faction(faction:name()) then
             if cm:get_saved_value("gt_tracker_"..faction:name()) == nil then
                 cm:set_saved_value("gt_tracker_"..faction:name(), 1)
-                if not faction:is_human() then
-                    if gt_set.AI_SWARM == true then
-                        cm:set_saved_value("gt_tracker_"..faction:name(), 8)
-                    else
-                        cm:set_saved_value("gt_tracker_"..faction:name(), 2)
-                    end
-                end
                 gt._levels[faction:name()] = 1
                 cm:apply_effect_bundle("grn_greentide_1", faction:name(), 0)
             else
@@ -273,11 +262,6 @@ cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context)
                 gt:log("Loaded greentide faction ["..faction:name().."] with the value ["..gt._levels[faction:name()].."] ")
             end
         end
-    end
-    --add the events 
-    for i = 1, #gt_events do
-        local current = gt_events[i]
-        gt:add_event(current.event, current.condition, current.faction, current.value)
     end
 end;
 
@@ -322,17 +306,3 @@ cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context)
         cm:set_saved_value("GTAdviceDisplayed", true)
     end
 end;
-
-local mcm = _G.mcm
-if mcm then
-    local settings = sfo:get_settings(mcm)
-    settings:add_variable("grn_decay", 1, 24, 12, 2, "Greeentide Decay Turns", "Your faction's Greentide meter will decay if you do not complete actions within this number of turns"):add_callback(function(context) 
-        gt_set.NUM_TURNS_BEFORE_DECAY = settings:get_variable_with_key("grn_decay"):current_value()
-    end)
-    local ai = settings:add_tweaker("grn_ai", "AI Greentide", "Grants high level Greentide bonuses to AI factions, making the tide of Greenskins a true threat to the world.")
-    ai:add_option("disabled", "Disabled", "Play with normal AI settings.")
-    ai:add_option("enabled", "WAAAAGH", "Play with the AI Greentide"):add_callback(function(context)
-        gt_set.AI_SWARM = true
-    end)
-
-end

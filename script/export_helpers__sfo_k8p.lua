@@ -6,9 +6,9 @@ function sfo_eight_peaks()
         if cm:get_faction("wh_main_grn_crooked_moon"):is_human() == false then
             cm:transfer_region_to_faction("wh_main_eastern_badlands_karak_eight_peaks", "wh_main_grn_crooked_moon")
             cm:transfer_region_to_faction("wh_main_southern_grey_mountains_karak_azgaraz", "wh_main_grn_necksnappers")
-            cm:teleport_to(cm:char_lookup_str(102), 466, 403, false);
-            cm:teleport_to(cm:char_lookup_str(12), 737, 262, false);	
-            cm:teleport_to(cm:char_lookup_str(11), 739, 262, false);
+            cm:teleport_to(cm:char_lookup_str(cm:get_faction("wh_main_grn_necksnappers"):faction_leader():cqi()), 466, 403, false); -- leader dude of necksnarfers
+            cm:teleport_to(cm:char_lookup_str(46), 737, 262, false);	 --skarsnik
+            cm:teleport_to(cm:char_lookup_str(47), 739, 262, false);    --his friend
             if not cm:is_multiplayer() then
                 cm:force_declare_war("wh_main_grn_crooked_moon", "wh_main_dwf_karak_azul", false, false);	
                 cm:force_declare_war("wh_main_dwf_karak_ziflin", "wh_dlc05_wef_wydrioth", false, false);

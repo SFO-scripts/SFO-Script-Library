@@ -30,16 +30,26 @@ local function sfo_starting_diplomacy()
 		cm:force_declare_war("wh_dlc08_nor_vanaheimlings", "wh_main_brt_bretonnia", false, false);
 	end
 
-if not cm:get_saved_value("Faction_Unlocker") then
+	if not cm:get_saved_value("Faction_Unlocker") then
         cm:force_make_trade_agreement("wh_main_teb_estalia", "wh2_main_emp_new_world_colonies");
         cm:force_make_trade_agreement("wh_main_teb_tilea", "wh2_main_emp_new_world_colonies");
     end
 
     sfo:log("starting diplomacy set without error.", "sfo_starting_diplomacy")
 end
-
+mcm = _G.mcm
 cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
-    if cm:is_new_game() then
+    if (cm:is_new_game() and not mcm) then
         sfo_starting_diplomacy()
-    end
+	else
+		local settings = sfo:get_settings(mcm)
+		local first_turn = settings:add_tweaker("first_turn", "First Turn Diplomacy Changes", "SFO changes the opening wars and positions of many characters.")
+		first_turn:add_option("enable", "Enabled", "Enable SFO first turn changes")
+		first_turn:add_option("disable", "Disabled", "Disable SFO first turn changes")
+		mcm:add_new_game_only_callback(function(context)
+			if settings:get_tweaker_with_key("first_turn"):selected_option():name() == "enable" then
+				sfo_starting_diplomacy()
+			end
+		end)
+	end
 end;

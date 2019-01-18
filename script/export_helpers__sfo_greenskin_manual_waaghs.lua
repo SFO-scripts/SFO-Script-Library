@@ -72,13 +72,13 @@ local function sfo_spawn_waaagh(faction)
     for i = 1, SFO_CONST_WAAGH_SIZE_BASE + cm:random_number(SFO_CONST_WAAGH_SIZE_VARIANCE) - 1 do
         unit_list = unit_list .. ",".. grn_units[cm:random_number(#grn_units)]
     end
-
+    local x, y = cm:find_valid_spawn_location_for_character_from_settlement(faction:name(), home_region:name(), false, false)
     cm:create_force(
         faction:name(),
         unit_list,
         home_region:name(),
-        home_region:settlement():logical_position_x() - 1,
-        home_region:settlement():logical_position_y() + 1,
+        x,
+        y,
         true,
         function(cqi)
             cm:apply_effect_bundle_to_characters_force(SFO_CONST_WAAGH_ARMY_BUNDLE, cqi, 0, true)

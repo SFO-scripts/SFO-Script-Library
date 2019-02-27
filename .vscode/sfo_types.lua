@@ -1,3 +1,11 @@
+--# assume global class SPAWN_FINDER
+
+
+
+
+
+
+
 --# assume global class MCM
 --# assume global class MCM_MOD
 --# assume global class MCM_VAR

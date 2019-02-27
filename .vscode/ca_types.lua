@@ -177,6 +177,7 @@
 --# assume CM.zero_action_points: method(charName: string)
 --# assume CM.add_agent_experience: method(charName: string, experience: number)
 --# assume CM.force_add_skill: method(lookup: string, skill_key: string)
+--# assume CM.remove_skill_point: method(lookup: string, skill: string)
 --# assume CM.force_add_and_equip_ancillary: method(lookup: string, ancillary: string)
 --More character commands
 --# assume CM.award_experience_level: method(char_lookup_str: string, level: int)
@@ -266,6 +267,14 @@
 --# location_y: number,
 --# location_z: number )
 --# assume CM.remove_marker: method (name: string)
+--VFX
+--# assume CM.add_character_vfx: method(cqi: CA_CQI, vfx_key: string, show_in_shroud: boolean)
+--# assume CM.remove_character_vfx: method(cqi: CA_CQI, vfx_key: string)
+--# assume CM.add_garrison_residence_vfx: method(cqi: CA_CQI, vfx: string, show_in_shroud: boolean)
+--# assume CM.remove_garrison_residence_vfx: method(cqi: CA_CQI, vfx_key: string)
+--shroud commands
+--# assume CM.show_shroud: method(show: boolean)
+--# assume CM.make_region_visible_in_shroud: method(faction_key: string, region_key: string)
 --Region Commands
 --# assume CM.transfer_region_to_faction: method(region: string, faction:string)
 --# assume CM.set_region_abandoned: method(region: string)
@@ -299,6 +308,11 @@
 --# assume CM.char_is_mobile_general_with_army: method(char: CA_CHAR) --> boolean
 --model overrides
 --# assume CM.override_building_chain_display: method(building_chain: string, settlement_skin: string)
+
+--script commands
+--# assume CM.load_global_script:  method(script: string)
+
+
 
 -- CAMPAIGN UI MANAGER
 --# assume CUIM.get_char_selected: method() --> string
@@ -601,7 +615,9 @@
 --# assume global class MISSION_MANAGER
 --# type global CA_MISSION_OBJECTIVE =
 --# "CAPTURE_REGIONS" | "SCRIPTED" | "RAZE_OR_SACK_N_DIFFERENT_SETTLEMENTS_INCLUDING" |
---# "ELIMINATE_CHARACTER_IN_BATTLE" | "MOVE_TO_REGION" | "DEFEAT_N_ARMIES_OF_FACTION"
+--# "ELIMINATE_CHARACTER_IN_BATTLE" | "MOVE_TO_REGION" | "DEFEAT_N_ARMIES_OF_FACTION" |
+--# "ENGAGE_FORCE"
+
 --creation
 --# assume MISSION_MANAGER.new: method(faction_key: string, mission_key: string, success_callback: function?, failure_callback: function?, cancellation_callback: function?) --> MISSION_MANAGER
 

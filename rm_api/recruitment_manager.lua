@@ -550,9 +550,13 @@ end
 
 
 --add a unit to a group
---v function(self: RECRUITER_MANAGER, unitID: string, groupID: string)
-function recruiter_manager.add_unit_to_group(self, unitID, groupID)
+--v function(self: RECRUITER_MANAGER, unitID: string, groupID: string, abstractID: string?)
+function recruiter_manager.add_unit_to_group(self, unitID, groupID, abstractID)
     local unit = self:get_unit(unitID)
+    if abstractID then
+        --# assume abstractID: string!
+        unit = self.overrideUnits[abstractID]
+    end
     unit:add_group_to_unit(groupID)
 
     self._groupToUnits[groupID] = self._groupToUnits[groupID] or {}

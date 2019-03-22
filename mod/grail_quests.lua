@@ -333,19 +333,44 @@ function grail_quest_manager.offer_dilemma_for_skill(self, skill, faction, char)
             if not _G.SPAWN_POINT_LOCATOR then
                 get_spawn_finder()
             end
-            local region, x, y = _G.SPAWN_POINT_LOCATOR.find_spawn_in_region_bordering_character(char, cm:get_faction(faction_to_spawn), false, {
-                ["wh_main_the_wasteland_marienburg"] = true
-            })
-            if region then
-                self:start_quest_for_character(context:dilemma(), char:cqi(), faction_to_spawn, region, x, y)
-            else
-                local region, x, y = _G.SPAWN_POINT_LOCATOR.find_spawn_in_bordering_region(char:faction(), cm:get_faction(faction_to_spawn))
+            --here, we want to find multiple valid spawns
+            local spawns = {} --:map<string, true>
+            --this one gets repeatedly passed as the black list
+            local full_spawns = {} --:map<string, {x: number, y:number}>
+            --this one holds valid coordinates
+            local num_spawns = 0
+            --this one holds the number of spawns we've found
+            while num_spawns < 5 do --find spawns until we have 3 to randomly choose from
+                local region, x, y = _G.SPAWN_POINT_LOCATOR.find_spawn_in_region_bordering_character(char, cm:get_faction(faction_to_spawn), false, spawns)
                 if region then
-                    self:start_quest_for_character(context:dilemma(), char:cqi(), faction_to_spawn, region, x, y)
+                    spawns[region] = true
+                    full_spawns[region] = {x = x, y = y}
+                    num_spawns = num_spawns + 1
                 else
-                    self:log("FATAL: Could not resolve a spawn point for a questing army.")
+                    if region then
+                        spawns[region] = true
+                        full_spawns[region] = {x = x, y = y}
+                        num_spawns = num_spawns + 1
+                    else
+                        break --we can't find a spawn, so lets stop trying.
+                    end
                 end
             end
+            if num_spawns == 0 then --if we didn't find any spawns, we need to warn the log. This shouldn't happen.
+                self:log("FATAL: Could not resolve a spawn point for a questing army.")
+                return
+            end
+            local chance_var = 100/num_spawns --:number
+            --we define this to keep it static
+            for region, spawn_data in pairs(full_spawns) do
+                if (num_spawns == 0) or (cm:random_number(100) > (100/chance_var)) then --if its the last spawn we have, always take it. Otherwise, 50% chance.
+                    self:start_quest_for_character(context:dilemma(), char:cqi(), faction_to_spawn, region, spawn_data.x, spawn_data.y)
+                    break --only spawn once
+                else
+                    num_spawns = num_spawns - 1 --reduce the number of remeaning spawns to check
+                end
+            end
+            --self:start_quest_for_character(context:dilemma(), char:cqi(), faction_to_spawn, region, x, y)
         end,
         false
     )

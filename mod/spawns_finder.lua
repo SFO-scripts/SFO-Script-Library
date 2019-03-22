@@ -16,6 +16,13 @@ local function LOG(text)
     popLog :flush()
     popLog :close()
 end
+
+
+--v function(ax: number, ay: number, bx: number, by: number) --> number
+local function distance_2D(ax, ay, bx, by)
+    return (((bx - ax) ^ 2 + (by - ay) ^ 2) ^ 0.5);
+end;
+
 local SPAWNER_STARTS = {
     ["wh_main_goromandy_mountains_baersonlings_camp"] = {762,594}, 
     ["wh_main_eastern_oblast_volksgrad"] = {724,584}, 
@@ -325,15 +332,14 @@ end
 --blacklist is a map of region keys to true. 
 --v function(faction_to_border: CA_FACTION, faction_to_spawn: CA_FACTION, blacklist: (map<string, true>)?) --> (string, number, number)
 local function find_spawn_in_bordering_region(faction_to_border, faction_to_spawn, blacklist)
-    local clock = os.clock()
     LOG("Getting a faction spawn point for ["..faction_to_spawn:name().."] bordering faction ["..faction_to_border:name().."] ")
     if not faction_to_border:has_home_region() then
-        LOG(" \n \t Returning INVALID RESULT due to NO REGIONS HELD BY FACTION TO BORDER after ".. string.format("elapsed time: %.2f\n", os.clock() - clock) .. "\n")
+        LOG(" \n \t Returning INVALID RESULT due to NO REGIONS HELD BY FACTION TO BORDER")
         return nil, nil, nil 
     end 
 
     for j = 0, faction_to_border:region_list():num_items() - 1 do
-        LOG("\n\t Checking adjacent list of ["..faction_to_border:region_list():item_at(j):name().."] ")
+        LOG("\n\t Checking adjacent list of ["..faction_to_border:region_list():item_at(j):name().."]")
         local adjacent_list = faction_to_border:region_list():item_at(j):adjacent_region_list()
         for i = 0, adjacent_list:num_items() - 1 do
             local current = adjacent_list:item_at(i)
@@ -343,17 +349,21 @@ local function find_spawn_in_bordering_region(faction_to_border, faction_to_spaw
                 --is the spawn point starting in that region valid?
                 --first, do we even have a start there?
                 if SPAWNER_STARTS[current:name()] then
-                    --we have a start there, is it valid?
-                    local startx = SPAWNER_STARTS[current:name()][1]
-                    local starty = SPAWNER_STARTS[current:name()][2]
-                    LOG("\n\t\t\t Checking the spawn point ["..current:name().."], ["..startx.."], ["..starty.."] ")
-                    --local x, y = cm:find_valid_spawn_location_for_character_from_position(faction_to_spawn:name(), startx, starty, false)
-                    x = startx
-                    y = starty
-                    if x > -1 and y > -1 then
-                        if is_spawn_free_of_characters(x, y) then
-                            LOG(" \n \t Returning Spawn set region: ["..current:name().."] x: ["..x.."] y: ["..y.."] after ".. string.format("elapsed time: %.2f\n", os.clock() - clock) .. "\n")
-                            return current:name(), x, y
+                    --next, is the region in the blacklist?
+                    --# assume blacklist: map<string, true>
+                    if (not blacklist) or (not blacklist[current:name()]) then
+                        --we have a start there, is it valid?
+                        local startx = SPAWNER_STARTS[current:name()][1]
+                        local starty = SPAWNER_STARTS[current:name()][2]
+                        LOG("\n\t\t\t Checking the spawn point ["..current:name().."], ["..startx.."], ["..starty.."] ")
+                        --local x, y = cm:find_valid_spawn_location_for_character_from_position(faction_to_spawn:name(), startx, starty, false)
+                        x = startx
+                        y = starty
+                        if x > -1 and y > -1 then
+                            if is_spawn_free_of_characters(x, y) then
+                                LOG(" \n \t Returning Spawn set region: ["..current:name().."] x: ["..x.."] y: ["..y.."]")
+                                return current:name(), x, y
+                            end
                         end
                     end
                 end
@@ -361,18 +371,87 @@ local function find_spawn_in_bordering_region(faction_to_border, faction_to_spaw
         end
     end
 
-    LOG(" \n \t Returning INVALID RESULT due to NO VALID RESULT FOUND after ".. string.format("elapsed time: %.2f\n", os.clock() - clock) .. "\n")
+    LOG(" \n \t Returning INVALID RESULT due to NO VALID RESULT FOUND")
     return nil, nil, nil
 end
 
---v function(character_to_border: CA_CHAR, faction_to_spawn: CA_FACTION, allow_own_territory: boolean, min_distance: number?)
-function find_spawn_in_region_bordering_character(character_to_border, faction_to_spawn, allow_own_territory, min_distance)
-
-
-
-
+--v function(character_to_border: CA_CHAR, faction_to_spawn: CA_FACTION, allow_own_territory: boolean, min_distance: number?, blacklist: (map<string, true>)?)  --> (string, number, number)
+function find_spawn_in_region_bordering_character(character_to_border, faction_to_spawn, allow_own_territory, min_distance, blacklist)
+    if character_to_border:region():is_null_interface() then
+        return nil, nil, nil
+    end
+    local adjacent_list = character_to_border:region():adjacent_region_list()
+    for i = 0, adjacent_list:num_items() - 1 do
+        local current = adjacent_list:item_at(i)
+        LOG("\n\t\t Checking the region ["..current:name().."]")
+        --is the candidate region owned by the faction we want to border? If not, proceed.
+        if (allow_own_territory) or (not current:settlement():is_null_interface()) and (current:owning_faction():name() ~= character_to_border:faction():name()) then
+            --is the spawn point starting in that region valid?
+            --first, do we even have a start there?
+            if SPAWNER_STARTS[current:name()] then
+                --next, is the region in the blacklist?
+                --# assume blacklist: map<string, true>
+                if (not blacklist) or (not blacklist[current:name()]) then
+                    --we have a start there, is it valid?
+                    local startx = SPAWNER_STARTS[current:name()][1]
+                    local starty = SPAWNER_STARTS[current:name()][2]
+                    LOG("\n\t\t\t Checking the spawn point ["..current:name().."], ["..startx.."], ["..starty.."] ")
+                    --local x, y = cm:find_valid_spawn_location_for_character_from_position(faction_to_spawn:name(), startx, starty, false)
+                    x = startx
+                    y = starty
+                    --# assume min_distance: number
+                    if (not min_distance) or (distance_2D(x, y, character_to_border:logical_position_x(), character_to_border:logical_position_y()) <= min_distance) then
+                        if x > -1 and y > -1 then
+                            if is_spawn_free_of_characters(x, y) then
+                                LOG(" \n \t Returning Spawn set region: ["..current:name().."] x: ["..x.."] y: ["..y.."]")
+                                return current:name(), x, y
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    --if we got here, none of our adjacents are gonna work, so lets do a double loop before giving up
+    local first_adjacents = character_to_border:region():adjacent_region_list()
+    for j = 0, first_adjacents:num_items() - 1 do
+        local adjacent_list = first_adjacents:item_at(j):adjacent_region_list()
+        for i = 0, adjacent_list:num_items() - 1 do
+            local current = adjacent_list:item_at(i)
+            LOG("\n\t\t Checking the region ["..current:name().."]")
+            --is the candidate region owned by the faction we want to border? If not, proceed.
+            if (allow_own_territory) or (not current:settlement():is_null_interface()) and (current:owning_faction():name() ~= character_to_border:faction():name()) then
+                --is the spawn point starting in that region valid?
+                --first, do we even have a start there?
+                if SPAWNER_STARTS[current:name()] then
+                    --next, is the region in the blacklist?
+                    --# assume blacklist: map<string, true>
+                    if (not blacklist) or (not blacklist[current:name()]) then
+                        --we have a start there, is it valid?
+                        local startx = SPAWNER_STARTS[current:name()][1]
+                        local starty = SPAWNER_STARTS[current:name()][2]
+                        LOG("\n\t\t\t Checking the spawn point ["..current:name().."], ["..startx.."], ["..starty.."] ")
+                        --local x, y = cm:find_valid_spawn_location_for_character_from_position(faction_to_spawn:name(), startx, starty, false)
+                        x = startx
+                        y = starty
+                        --# assume min_distance: number
+                        if (not min_distance) or (distance_2D(x, y, character_to_border:logical_position_x(), character_to_border:logical_position_y()) <= min_distance) then
+                            if x > -1 and y > -1 then
+                                if is_spawn_free_of_characters(x, y) then
+                                    LOG(" \n \t Returning Spawn set region: ["..current:name().."] x: ["..x.."] y: ["..y.."]")
+                                    return current:name(), x, y
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return nil, nil, nil
 end
 _G.SPAWN_POINT_LOCATOR = {
         is_spawn_free_of_characters = is_spawn_free_of_characters,
-        find_spawn_in_bordering_region = find_spawn_in_bordering_region
+        find_spawn_in_bordering_region = find_spawn_in_bordering_region,
+        find_spawn_in_region_bordering_character = find_spawn_in_region_bordering_character
     }

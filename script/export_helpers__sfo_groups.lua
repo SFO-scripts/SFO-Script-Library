@@ -1,4 +1,4 @@
-cm = get_cm(); sfo = _G.sfo; rm = _G.rm; mcm = _G.mcm
+cm = get_cm(); sfo = _G.sfo; rm = _G.rm;
 
 local units = {
 {"wh_main_emp_inf_greatswords", "emp_special"},
@@ -272,80 +272,41 @@ function sfo_apply_cap_bundle()
 
 end
 
-if not mcm then
-    core:add_listener(
-        "SFOcapsDilemma",
-        "DilemmaChoiceMadeEvent",
-        function(context)
-            return context:dilemma() == "cap_army_choice"
-        end,
-        function(context)
-            if context:choice() == 1 or context:choice() == 2 then
-                sfo_add_unit_caps()
-                cm:set_saved_value("SFO_APPLY_CAPS", true)
-                cm:callback(function()
-                    for name, _ in pairs(groups) do
-                        if string.find(name, "special") then
-                            rm:set_ui_name_for_group(name, "Special Units")
-                            rm:add_character_quantity_limit_for_group(name, 6)
-                        end
-                        if string.find(name, "elite") then
-                            rm:set_ui_name_for_group(name, "Elite Units")
-                            rm:add_character_quantity_limit_for_group(name, 4)
-                        end
-                        if string.find(name, "rare") then
-                            rm:set_ui_name_for_group(name, "Rare Units")
-                            rm:add_character_quantity_limit_for_group(name, 2)
-                        end
+
+
+core:add_listener(
+    "SFOcapsDilemma",
+    "DilemmaChoiceMadeEvent",
+    function(context)
+        return context:dilemma() == "cap_army_choice"
+    end,
+    function(context)
+        if context:choice() == 1 or context:choice() == 2 then
+            sfo_add_unit_caps()
+            cm:set_saved_value("SFO_APPLY_CAPS", true)
+            cm:callback(function()
+                for name, _ in pairs(groups) do
+                    if string.find(name, "special") then
+                        rm:set_ui_name_for_group(name, "Special Units")
+                        rm:add_character_quantity_limit_for_group(name, 6)
                     end
-                end, 5)
-            end
-            if context:choice() == 2 or context:choice() == 3 then
-                sfo_apply_cap_bundle()
-            end
-        end,
-        false)
-else
-    local sfo_set = sfo:get_settings(mcm)
-    local caps = sfo_set:add_tweaker("unit_caps", "Unit Caps", "Settings for faction and army wide unit caps")
-    caps:add_option("faction", "Faction Caps", "Enables faction wide caps that can be increased with buildings"):add_callback(function(context)
-        rm:enforce_restrictions(false)
-    end)
-    caps:add_option("army", "Army Caps", "Enables army wide caps that limit powerful units."):add_callback(function(context)
-        sfo_apply_cap_bundle()
-    end)
-    caps:add_option("both", "Both Caps", "Enable both types of caps"):add_callback(function(context)
-    
-    end)
-    caps:add_option("neither", "No Caps", "Don't cap units at all."):add_callback(function(context)
-        sfo_apply_cap_bundle()
-        rm:enforce_restrictions(false)
-    end)
-    local cap_special = sfo_set:add_variable("special_cap", 1, 20, 6, 1, "Special Unit Cap", "Will only apply when army wide caps are selected"):add_callback(function(context)
-        for name, _ in pairs(groups) do
-            if string.find(name, "special") then
-                rm:set_ui_name_for_group(name, "Special Units")
-                rm:add_character_quantity_limit_for_group(name, sfo:get_settings(mcm):get_variable_with_key("special_cap"):current_value())
-            end
+                    if string.find(name, "elite") then
+                        rm:set_ui_name_for_group(name, "Elite Units")
+                        rm:add_character_quantity_limit_for_group(name, 4)
+                    end
+                    if string.find(name, "rare") then
+                        rm:set_ui_name_for_group(name, "Rare Units")
+                        rm:add_character_quantity_limit_for_group(name, 2)
+                    end
+                end
+            end, 5)
         end
-    end)
-    local cap_elite = sfo_set:add_variable("elite_cap", 1, 20, 4, 1, "Elite Unit Cap", "Will only apply when army wide caps are selected"):add_callback(function(context)
-        for name, _ in pairs(groups) do
-            if string.find(name, "elite") then
-                rm:set_ui_name_for_group(name, "Elite Units")
-                rm:add_character_quantity_limit_for_group(name, sfo:get_settings(mcm):get_variable_with_key("elite_cap"):current_value())
-            end
+        if context:choice() == 2 or context:choice() == 3 then
+            sfo_apply_cap_bundle()
         end
-    end)
-    local cap_rare = sfo_set:add_variable("rare_cap", 1, 20, 2, 1, "Rare Unit Cap", "Will only apply when army wide caps are selected"):add_callback(function(context)
-        for name, _ in pairs(groups) do
-            if string.find(name, "rare") then
-                rm:set_ui_name_for_group(name, "Rare Units")
-                rm:add_character_quantity_limit_for_group(name, sfo:get_settings(mcm):get_variable_with_key("rare_cap"):current_value())
-            end
-        end
-    end)
-end
+    end,
+    false)
+
 
 if cm:get_saved_value("SFO_APPLY_CAPS") then
     sfo_add_unit_caps()
@@ -366,4 +327,5 @@ if cm:get_saved_value("SFO_APPLY_CAPS") then
         end
     end
 end
-        
+    
+    

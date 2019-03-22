@@ -174,3 +174,13 @@
 --# assume LIST_VIEW.PositionRelativeTo: method(component: WHATEVER, xDiff: number, yDiff: number)
 --# assume LIST_VIEW.MoveTo: method(x: number, y:number)
 --# assume LIST_VIEW.Position: method() --> (number, number)
+
+
+
+
+--RM Types
+
+--# assume global class RECRUITER_MANAGER
+--# assume global class RECRUITER_UNIT
+--# assume global class RECRUITER_CHARACTER
+--# assume global class RECRUITER_PATHSET

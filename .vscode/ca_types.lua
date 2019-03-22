@@ -257,6 +257,8 @@
 --# assume CM.pending_battle_cache_get_attacker: method(pos: int) --> (CA_CQI, CA_CQI, string)
 --# assume CM.pending_battle_cache_get_enemies_of_char: method(char: CA_CHAR) --> vector<CA_CHAR>
 --# assume CM.pending_battle_cache_attacker_victory: method() --> boolean
+--# assume CM.pending_battle_cache_char_is_attacker: method(char: CA_CHAR) --> boolean
+--# assume CM.pending_battle_cache_char_is_defender: method(char: CA_CHAR) --> boolean
 --CAI
 --# assume CM.force_change_cai_faction_personality: method(key: string, personality: string)
 ---Markers
@@ -308,7 +310,8 @@
 --# assume CM.char_is_mobile_general_with_army: method(char: CA_CHAR) --> boolean
 --model overrides
 --# assume CM.override_building_chain_display: method(building_chain: string, settlement_skin: string)
-
+--stances
+--# assume CM.force_character_force_into_stance: method(lookup: string, stance: string)
 --script commands
 --# assume CM.load_global_script:  method(script: string)
 
@@ -358,6 +361,8 @@
 --# assume CA_CHAR.family_member: method() --> CA_CHAR
 --# assume CA_CHAR.is_null_interface: method() --> boolean
 --# assume CA_CHAR.has_skill: method(skill_key: string) --> boolean
+--# assume CA_CHAR.is_politician: method() --> boolean
+--# assume CA_CHAR.has_garrison_residence: method() --> boolean
 
 -- CHARACTER LIST
 --# assume CA_CHAR_LIST.num_items: method() --> number
@@ -372,6 +377,7 @@
 --# assume CA_MILITARY_FORCE.character_list: method() --> CA_CHAR_LIST
 --# assume CA_MILITARY_FORCE.has_general: method() --> boolean
 --# assume CA_MILITARY_FORCE.is_armed_citizenry: method() --> boolean
+--# assume CA_MILITARY_FORCE.active_stance: method() --> string
 
 -- MILITARY FORCE LIST
 --# assume CA_MILITARY_FORCE_LIST.num_items: method() --> number
@@ -385,7 +391,7 @@
 --# assume CA_UNIT.military_force: method() --> CA_MILITARY_FORCE
 --# assume CA_UNIT.has_military_force: method() --> boolean
 --# assume CA_UNIT.percentage_proportion_of_full_strength: method() --> number
-
+--# assume CA_UNIT.get_unit_custom_battle_cost: method() --> number
 
 --UNIT_LIST
 
@@ -699,4 +705,11 @@
 --v [string_meta] function(self: string, start: string) --> boolean
 function string.starts_with(self, start)
     return true
+end
+
+
+--v [require] method(script: string)
+function cm:load_global_script(script)
+
+
 end

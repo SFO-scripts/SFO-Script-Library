@@ -333,7 +333,7 @@ function grail_quest_manager.offer_dilemma_for_skill(self, skill, faction, char)
             if not _G.SPAWN_POINT_LOCATOR then
                 get_spawn_finder()
             end
-            local region, x, y = _G.SPAWN_POINT_LOCATOR.find_spawn_in_region_bordering_character(char, cm:get_faction(faction_to_spawn), false, 15, {
+            local region, x, y = _G.SPAWN_POINT_LOCATOR.find_spawn_in_region_bordering_character(char, cm:get_faction(faction_to_spawn), false, {
                 ["wh_main_the_wasteland_marienburg"] = true
             })
             if region then
@@ -341,9 +341,7 @@ function grail_quest_manager.offer_dilemma_for_skill(self, skill, faction, char)
             else
                 local region, x, y = _G.SPAWN_POINT_LOCATOR.find_spawn_in_bordering_region(char:faction(), cm:get_faction(faction_to_spawn))
                 if region then
-                    self:start_quest_for_character(context:dilemma(), char:cqi(), faction_to_spawn, region, x, y, {
-                        ["wh_main_the_wasteland_marienburg"] = true
-                    })
+                    self:start_quest_for_character(context:dilemma(), char:cqi(), faction_to_spawn, region, x, y)
                 else
                     self:log("FATAL: Could not resolve a spawn point for a questing army.")
                 end

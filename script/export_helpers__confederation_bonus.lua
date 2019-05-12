@@ -26,8 +26,16 @@ end
 --enter the faction name of who should be confederated. Then enter a function key, and its associated string key.
 --the current ones are enumerated right above this.
 local confed_rewards = {
-    ["wh_main_brt_bretonnia"] = {"bundle_5", "my_effect_bundle"},
-    ["wh_main_brt_carcassone"] = {"dilemma_trigger", "my_dilemma_key"}
+    ["wh2_main_brt_knights_of_origo"] = {"dilemma_trigger", "conf_knights_of_origo"},
+    ["wh2_main_brt_knights_of_the_flame"] = {"dilemma_trigger", "conf_knights_of_the_flame"},
+    ["wh2_main_brt_thegans_crusaders"] = {"dilemma_trigger", "conf_thegans_crusaders"},
+    ["wh_main_brt_artois"] = {"dilemma_trigger", "conf_artois"},
+    ["wh_main_brt_bastonne"] = {"dilemma_trigger", "conf_bastonne"},
+    ["wh_main_brt_bordeleaux"] = {"dilemma_trigger", "conf_bordeleaux"},
+    ["wh_main_brt_bretonnia"] = {"dilemma_trigger", "conf_bretonnia"},
+    ["wh_main_brt_carcassonne"] = {"dilemma_trigger", "conf_carcassonne"},
+    ["wh_main_brt_parravon"] = {"dilemma_trigger", "conf_parravon"},
+    ["wh_main_brt_lyonesse"] = {"dilemma_trigger", "conf_lyonesse"}
 }--:map<string, {string, string}>
 
 
@@ -40,7 +48,7 @@ core:add_listener(
     function(context)
         local instruction = confed_rewards[context:faction():name()][1]
         local key = confed_rewards[context:faction():name()][2]
-        confed_reward_custom_functions[instruction](context:confederation():name(), key)
+        confed_reward_custom_functions[instruction](context:confederation(), key)
     end,
     true
 )

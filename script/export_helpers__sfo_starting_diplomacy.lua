@@ -30,7 +30,7 @@ local function sfo_starting_diplomacy()
 		cm:force_declare_war("wh_dlc08_nor_vanaheimlings", "wh_main_brt_bretonnia", false, false);
 	end
 
-	if not cm:get_saved_value("Faction_Unlocker") then
+if not cm:get_saved_value("Faction_Unlocker") then
         cm:force_make_trade_agreement("wh_main_teb_estalia", "wh2_main_emp_new_world_colonies");
         cm:force_make_trade_agreement("wh_main_teb_tilea", "wh2_main_emp_new_world_colonies");
     end

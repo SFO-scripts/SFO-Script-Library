@@ -1,12 +1,34 @@
 cm = get_cm(); sfo = _G.sfo
 CONST_SFO_STARTING_UNITS = {
+    ["wh_main_emp_empire"] = {
+        "wh_main_emp_inf_greatswords",
+        "wh_main_emp_inf_greatswords",
+        "wh_main_emp_cav_reiksguard"
+    },
     ["wh_main_emp_middenland"] = {
         "emp_wolf_knight",
         "emp_wolf_knight"
     },
+    ["wh_main_dwf_dwarfs"] = {
+        "dwf_everguard"
+    },
+    ["wh2_dlc11_def_the_blessed_dread"] = {
+        "def_dread"
+    },
     ["wh2_main_skv_clan_mors"] = {
         "wh2_main_skv_inf_stormvermin_0",
         "wh2_main_skv_inf_stormvermin_0"
+    },
+    ["wh2_main_skv_clan_skyre"] = {
+        "wh2_main_skv_inf_clanrats_0",
+        "wh2_main_skv_inf_clanrats_0",
+        "wh2_main_skv_inf_clanrats_0"
+    },
+    ["wh2_main_lzd_hexoatl"] = {
+        "wh2_main_lzd_mon_bastiladon_blessed_2"
+    },
+    ["wh2_dlc12_lzd_cult_of_sotek"] = {
+        "wh2_dlc12_lzd_inf_skink_red_crested_0"
     },
     ["wh2_main_lzd_last_defenders"] = {
         "wh2_main_lzd_mon_carnosaur_blessed_0"

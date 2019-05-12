@@ -70,10 +70,10 @@ end
 --Here there be monsters! Kailua strongly dislikes the way this is done and *will* complain. NOCHECK. 
 --v [NO_CHECK] function(self: SFO_MANAGER)
 function sfo_util.enable_error_checker(self)   
-    if cm:get_saved_value("MODDER_ERROR_CHECKER") then
+    if _G.__error_checking_enabled then
         return 
     end
-    cm:set_saved_value("MODDER_ERROR_CHECKER", true)
+    _G.__error_checking_enabled = true
 
     --safely calls a function
     --v function(func: function) --> any

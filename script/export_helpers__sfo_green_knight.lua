@@ -1,5 +1,3 @@
---[[
-
 cm = get_cm(); sfo =_G.sfo
 
 local function sfo_green_knight()
@@ -28,7 +26,6 @@ local function sfo_green_knight()
                 end
                 if character:faction():is_human() and not cm:is_multiplayer() then
                     -- fly camera to Green Knight
-                    cm:scroll_camera_from_current(1, false, {character:display_position_x(), character:display_position_y(), 14.7, 0.0, 12.0});
                     cm:scroll_camera_from_current(false, 1, {character:display_position_x(), character:display_position_y(), 14.7, 0.0, 12.0});
                 end;
 
@@ -40,5 +37,3 @@ end
 cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
     sfo_green_knight()
 end;
-
---]]

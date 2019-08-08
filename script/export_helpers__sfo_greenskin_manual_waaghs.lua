@@ -72,16 +72,31 @@ local function sfo_spawn_waaagh(faction)
     for i = 1, SFO_CONST_WAAGH_SIZE_BASE + cm:random_number(SFO_CONST_WAAGH_SIZE_VARIANCE) - 1 do
         unit_list = unit_list .. ",".. grn_units[cm:random_number(#grn_units)]
     end
-    local x, y = cm:find_valid_spawn_location_for_character_from_settlement(faction:name(), home_region:name(), false, false)
+    local leaderx --:number
+    local leadery --:number
+    if faction:faction_leader():has_military_force() then
+         leaderx, leadery = cm:find_valid_spawn_location_for_character_from_position(faction:name(), faction:faction_leader():logical_position_x()+1, faction:faction_leader():logical_position_y(), false)
+    elseif faction:has_home_region() then
+        leaderx, leadery = cm:find_valid_spawn_location_for_character_from_settlement(faction:name(), faction:home_region():name(), false, false)
+    else
+        --no home region and no armies, how the fuck are you alive?
+        return 
+    end
+   
+    if x ==  -1 and y == -1 then
+        sfo:log("Failed to sapwn the manual waaagh! Find spawn location returned -1, -1 as x, y")
+        return
+    end
     cm:create_force(
         faction:name(),
         unit_list,
         home_region:name(),
-        x,
-        y,
+        leaderx,
+        leadery,
         true,
         function(cqi)
-            cm:apply_effect_bundle_to_characters_force(SFO_CONST_WAAGH_ARMY_BUNDLE, cqi, 0, true)
+            cm:apply_effect_bundle_to_characters_force(SFO_CONST_WAAGH_ARMY_BUNDLE, cqi, SFO_CONST_WAAGH_BUNDLE_TIMER, true)
+            CampaignUI.ClearSelection()
         end
     )
 

@@ -261,6 +261,7 @@
 --# assume CM.pending_battle_cache_char_is_defender: method(char: CA_CHAR) --> boolean
 --CAI
 --# assume CM.force_change_cai_faction_personality: method(key: string, personality: string)
+--# assume CM.cai_disable_movement_for_character: method(lookup: string)
 ---Markers
 --# assume CM.add_marker: method(
 --# name: string,

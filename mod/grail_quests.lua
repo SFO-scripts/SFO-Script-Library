@@ -2,7 +2,7 @@
 --# assume global class GRAIL_QUEST_MANAGER
 local grail_quest_manager = {} --# assume grail_quest_manager: GRAIL_QUEST_MANAGER
 --# type global QUEST_TEMPLATE = {_dilemma: string, _skill: string, --_trait: string,
---#_mission: string,  _targets: vector<string>, _armies: map<string, vector<string>>, _size: number}
+--#_mission: string,  _targets: vector<string>, _armies: map<string, vector<string>>, _size: number, _level: number}
 
 
 --v method(text: any)
@@ -189,7 +189,7 @@ function grail_quest_manager.start_quest_for_character(self, dilemma, quester_cq
         region, x, y, true,
         function(spawn_cqi)
             local mission_name = template._mission..faction_to_spawn
-            local bundle_key = template._dilemma.."_reward_"..cm:random_number(5)
+            local bundle_key = template._dilemma.."_reward_"..cm:random_number(10)
             local marker_key = template._dilemma.."_marker"
             self:log("Spawned the quest army, new army CQI is ["..tostring(spawn_cqi).."], mission to be triggered is ["..mission_name.."] for [".. quest_char:faction():name().."], with Payload ["..bundle_key.."]")
             --add a vfx to our character
@@ -198,9 +198,12 @@ function grail_quest_manager.start_quest_for_character(self, dilemma, quester_cq
             cm:apply_effect_bundle_to_characters_force(template._mission.."buff", spawn_cqi, 0, true)
             --add a marker to the quester
             cm:apply_effect_bundle_to_characters_force(marker_key, quester_cqi, 0, true)
+            --add exp to the character
+            cm:add_agent_experience(cm:char_lookup_str(spawn_cqi), template._level*1500)
             --prevent other factions from killing our amigo
             cm:force_diplomacy("all", "faction:"..faction_to_spawn, "all", false, false, false)
             cm:force_diplomacy("faction:".. quest_char:faction():name(), "faction:"..faction_to_spawn, "war", true, true, false)
+            cm:cai_disable_movement_for_character(cm:char_lookup_str(spawn_cqi))
             cm:force_declare_war(quest_char:faction():name(), faction_to_spawn, false, false)
             --set up a listener to reveal shroud each turn!
             core:add_listener("BrtQuestListener"..mission_name, "FactionTurnStart", true,
@@ -213,59 +216,23 @@ function grail_quest_manager.start_quest_for_character(self, dilemma, quester_cq
             --increment the number of active quests
             self._numActiveQuestsLocal[quest_char:faction():name()] = self._numActiveQuestsLocal[quest_char:faction():name()] + 1
             cm:set_saved_value("grail_quests_"..quest_char:faction():name(), self._numActiveQuestsLocal[quest_char:faction():name()])
+            --set the faction active
+            cm:set_saved_value("grail_quests_active_factions_"..faction_to_spawn, true)
+            --set the cqi of the mission
+            cm:set_saved_value("grail_questers_"..mission_name, quester_cqi)
+
            --set up new mission
            local mm = mission_manager:new(
                 quest_char:faction():name(),
-                mission_name,
-                function()  --on success,
-                    core:remove_listener("BrtQuestListener"..mission_name)
-                    cm:remove_effect_bundle_from_characters_force(marker_key, quester_cqi)
-                    self._numActiveQuestsLocal[quest_char:faction():name()] = self._numActiveQuestsLocal[quest_char:faction():name()] - 1
-                    cm:set_saved_value("grail_quests_"..quest_char:faction():name(), self._numActiveQuestsLocal[quest_char:faction():name()])
-                end, 
-                function()  --on failure,
-                    cm:remove_skill_point(cm:char_lookup_str(quester_cqi), template._skill)
-                    core:remove_listener("BrtQuestListener"..mission_name)
-                    cm:remove_effect_bundle_from_characters_force(marker_key, quester_cqi)
-                    self._numActiveQuestsLocal[quest_char:faction():name()] = self._numActiveQuestsLocal[quest_char:faction():name()] - 1
-                    cm:set_saved_value("grail_quests_"..quest_char:faction():name(), self._numActiveQuestsLocal[quest_char:faction():name()])
-                end, 
-                function()  --on cancellation
-                    cm:remove_skill_point(cm:char_lookup_str(quester_cqi), template._skill) 
-                    core:remove_listener("BrtQuestListener"..mission_name)
-                    cm:remove_effect_bundle_from_characters_force(marker_key, quester_cqi)
-                    self._numActiveQuestsLocal[quest_char:faction():name()] = self._numActiveQuestsLocal[quest_char:faction():name()] - 1
-                    cm:set_saved_value("grail_quests_"..quest_char:faction():name(), self._numActiveQuestsLocal[quest_char:faction():name()])
-                end 
-           ) 
-           mm:set_mission_issuer("CLAN_ELDERS")
-           --mm:set_should_whitelist(true)
-         --  mm:add_new_objective("SCRIPTED")
-
-          
-           mm:add_new_scripted_objective(
-               "mission_text_text_"..mission_name,
-               "CharacterCompletedBattle",
-                function(context)
-                    self:log("checking post battle if a quest was won!")
-                    if cm:pending_battle_cache_char_is_attacker(cm:get_character_by_cqi(quester_cqi)) then
-                        if cm:pending_battle_cache_char_is_defender(cm:get_character_by_cqi(spawn_cqi)) then
-                            return cm:model():pending_battle():attacker():won_battle()
-                        end
-                    end
-                    return false
-                end,
-                "GrailQuestScriptedObjective"
-           )
-           mm:add_heading("mission_text_text_"..mission_name.."_head")
-           mm:add_description("mission_text_text_"..mission_name.."_desc")
-           mm:add_scripted_objective_failure_condition("CustomScriptEventQuestFailed", function(context)
-                return context:character():cqi() == quester_cqi
-            end, "GrailQuestScriptedObjective")
-            mm:add_payload("effect_bundle{bundle_key "..bundle_key..";turns 5;}");
-           -- mm:add_new_objective("ENGAGE_FORCE")
-          --  mm:add_condition("cqi ".. tostring(cqi))
-          --  mm:add_condition("requires_victory");
+                mission_name)
+                mm:set_mission_issuer("CLAN_ELDERS")
+           --mm:add_heading("mission_text_text_"..mission_name.."_head")
+          -- mm:add_description("mission_text_text_"..mission_name.."_desc")
+            mm:add_new_objective("ENGAGE_FORCE")
+            mm:add_condition("cqi ".. tostring(cm:get_character_by_cqi(spawn_cqi):military_force():command_queue_index()))
+            mm:add_condition("requires_victory");
+            mm:add_payload("effect_bundle{bundle_key "..bundle_key..";turns 10;}");
+            mm:trigger()
           --  mm:add_payload("money 2000");
           -- mm:add_payload("money "..tostring((template._size*50)+(150*cm:random_number(3))));
            --mm:set_turn_limit(15)
@@ -275,7 +242,8 @@ function grail_quest_manager.start_quest_for_character(self, dilemma, quester_cq
            cm:callback(function()
             cm:scroll_camera_from_current(false, 1, {enemy:display_position_x(), enemy:display_position_y(), 14.7, 0.0, 12.0});
             end, 0.3)
-           mm:trigger()
+           
+           cm:replenish_action_points(cm:char_lookup_str(quester_cqi))
         end
     )
     --add a listener to see if they have moved closer to their quest!
@@ -285,21 +253,101 @@ end
 --v function(self: GRAIL_QUEST_MANAGER, template: QUEST_TEMPLATE) --> string
 function grail_quest_manager.pick_faction_to_spawn(self, template)
     local targets = template._targets
-    local offset = cm:random_number(#targets)
-    for i = 1, #targets do
-        local real_index = i + offset
-        if real_index > #targets then
-            real_index = real_index - #targets
+    local num_checks = #targets
+    local index_offset = cm:random_number(num_checks)
+    for i = 1, num_checks do
+        local index = i + index_offset
+        if index > num_checks then
+            index = index - num_checks
         end
-        if cm:get_faction(targets[i]) and cm:get_faction(targets[i]):is_dead() then
-            return targets[i]
+        local faction = targets[index]
+        if faction and cm:get_saved_value("grail_quests_active_factions_"..faction) == true then --if faction exists but its active
+            --do nothing
+        elseif faction then --if it exists
+            return faction --return it.
         end
     end
     return nil
 end
 
+--v function(self: GRAIL_QUEST_MANAGER, faction: string, mission: string)
+function grail_quest_manager.cleanup_completed_mission(self, faction, mission)
+    --decrement the number of active quests
+    self._numActiveQuestsLocal[faction] = self._numActiveQuestsLocal[faction] + 1
+    cm:set_saved_value("grail_quests_"..faction, self._numActiveQuestsLocal[faction])
+    --get the faction
+    local quest_target --:string
+
+    --get the quester
+    local quester_cqi = cm:get_saved_value("grail_questers_"..mission) --:CA_CQI
+    --let them do grail quests
+    cm:set_saved_value("allow_grail_for_"..tostring(quester_cqi), true)
+    if mission:find("brt_questing_") then
+        quest_target = mission:gsub("brt_questing_", "")
+    elseif mission:find("brt_grail_") then
+        quest_target = mission:gsub("brt_grail_", "")
+    end
+    local quest_enemy = cm:get_faction(quest_target)
+    if quest_enemy:is_dead() then
+        cm:set_saved_value("grail_quests_active_factions_"..quest_enemy:name(), false)
+    else
+        for i = 0, quest_enemy:character_list():num_items() - 1 do
+            if cm:char_is_mobile_general_with_army(quest_enemy:character_list():item_at(i)) then
+                cm:kill_character(quest_enemy:character_list():item_at(i):command_queue_index(), true, true)
+            end
+        end
+        cm:set_saved_value("grail_quests_active_factions_"..quest_enemy:name(), false)
+    end
+    local dilemma_key = mission:gsub(quest_target, ""):gsub("brt_", "brt_quest_")
+    cm:remove_effect_bundle_from_characters_force(dilemma_key.."marker", quester_cqi)
+    cm:set_saved_value("grail_questers_"..mission, nil)
+end
+
+--v function(self: GRAIL_QUEST_MANAGER, faction: string, mission: string)
+function grail_quest_manager.cleanup_failed_mission(self, faction, mission)
+    --decrement the number of active quests
+    self._numActiveQuestsLocal[faction] = self._numActiveQuestsLocal[faction] + 1
+    cm:set_saved_value("grail_quests_"..faction, self._numActiveQuestsLocal[faction])
+    --get the faction
+    local quest_target --:string
+
+    --get the quester
+    local quester_cqi = cm:get_saved_value("grail_questers_"..mission) --:CA_CQI
+    if mission:find("brt_questing_") then
+        cm:remove_skill_point(cm:char_lookup_str(quester_cqi), "brt_quest_errant_small_1")
+        --we remove their skill point
+        quest_target = mission:gsub("brt_questing_", "")
+    elseif mission:find("brt_grail_") then
+        quest_target = mission:gsub("brt_grail_", "")
+        cm:remove_skill_point(cm:char_lookup_str(quester_cqi), "brt_quest_errant_grand_1")
+        --we remove their skill point
+    end
+    local quest_enemy = cm:get_faction(quest_target)
+    if quest_enemy:is_dead() then
+        cm:set_saved_value("grail_quests_active_factions_"..quest_enemy:name(), false)
+    else
+        for i = 0, quest_enemy:character_list():num_items() - 1 do
+            if cm:char_is_mobile_general_with_army(quest_enemy:character_list():item_at(i)) then
+                cm:kill_character(quest_enemy:character_list():item_at(i):command_queue_index(), true, true)
+            end
+        end
+        cm:set_saved_value("grail_quests_active_factions_"..quest_enemy:name(), false)
+    end
+    cm:set_saved_value("grail_questers_"..mission, nil)
+end
 
 
+--v function(self: GRAIL_QUEST_MANAGER, human_faction: string)
+function grail_quest_manager.turn_start_reveals(self, human_faction)
+    for key, template in pairs(self._questTemplates) do
+        for i = 1, #template._targets do
+            local target = template._targets[i]
+            if (not cm:get_faction(target):is_dead()) and (not cm:get_faction(target):faction_leader():region():is_null_interface()) then
+                cm:make_region_visible_in_shroud(human_faction, cm:get_faction(target):faction_leader():region():name())
+            end
+        end
+    end
+end
 
 
 --v function(self: GRAIL_QUEST_MANAGER, skill: string, faction: string, char: CA_CHAR)
@@ -385,3 +433,42 @@ cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context)
     end
 
 end
+
+
+core:add_listener(
+    "GrailQuestsRevealTurnStart",
+    "FactionTurnStart",
+    function(context)
+        return context:faction():is_human() and context:faction():subculture() == "wh_main_sc_brt_bretonnia"
+    end,
+    function(context)
+        _G.gqm:turn_start_reveals(context:faction():name())
+    end,
+    true
+)
+
+core:add_listener(
+	"GrailQuestSucceeeded",
+	"MissionSucceeded",
+	true,
+	function(context)
+		local ok, err = pcall(function()
+            _G.gqm:cleanup_completed_mission(context:faction():name(), context:mission():mission_record_key())
+		end)
+		if not ok then
+		end
+	end,
+	true);
+
+core:add_listener(
+	"GrailQuestSucceeededCancalled",
+	"MissionCancelled",
+	true,
+	function(context)
+		local ok, err = pcall(function()
+			_G.gqm:cleanup_failed_mission(context:faction():name(), context:mission():mission_record_key())
+			end)
+			if not ok then
+			end
+	end,
+	true);

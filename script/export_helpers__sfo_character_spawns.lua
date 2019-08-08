@@ -1,25 +1,32 @@
-cm = get_cm()
-
-
-function ven_spawn_characters()
-	if cm:model():campaign_name("main_warhammer") then
-		if cm:is_new_game() then
-
-			cm:create_agent(
-							"wh_main_dwf_karak_kadrin",
-							"champion",
-							"dwf_cha_slayer",
-							718,
-							453,
-							false,
-							function(cqi)
-								cm:replenish_action_points(cm:char_lookup_str(cqi));
-							end
-						);
-		end;
-	end;
+function chs_cha_bloodthirster_add()
+	if not cm:get_faction("wh_main_chs_chaos") then
+		return
+	end
+    if not cm:get_faction("wh_main_chs_chaos"):is_dead() then
+        if not cm:get_saved_value("chs_cha_bloodthirster_unlocked") then 
+            cm:spawn_character_to_pool("wh_main_chs_chaos", "names_name_1", "names_name_2", "", "", 50, true, "dignitary", "chs_cha_bloodthirster", true, "");
+            cm:set_saved_value("chs_cha_bloodthirster_unlocked", true);
+        end;
+    end;
 end;
 
-cm.first_tick_callbacks[#cm.first_tick_callbacks+1] = function(context) 
-	ven_spawn_characters();
+cm:add_first_tick_callback(function()
+    chs_cha_bloodthirster_add()
+end)
+
+
+function dwf_cha_slayer_add()
+	if not cm:get_faction("wh_main_dwf_karak_kadrin") then
+		return
+	end
+    if not cm:get_faction("wh_main_dwf_karak_kadrin"):is_dead() then
+        if not cm:get_saved_value("dwf_cha_slayer_unlocked") then 
+            cm:spawn_character_to_pool("wh_main_dwf_karak_kadrin", "names_name_3", "names_name_4", "", "", 50, true, "champion", "dwf_cha_slayer", true, "");
+            cm:set_saved_value("dwf_cha_slayer_unlocked", true);
+        end;
+    end;
 end;
+
+cm:add_first_tick_callback(function()
+    dwf_cha_slayer_add()
+end)
